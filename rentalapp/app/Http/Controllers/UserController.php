@@ -17,26 +17,43 @@ class UserController extends Controller
 
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 400);
+                return response()->json(['status' => false, 'code' => 207], 400);
             }
         } catch (JWTException $e) {
-            return response()->json(['error' => 'could_not_create_token'], 500);
+            return response()->json(['status' => false, 'code' => 208], 400);
         }
-
-        return response()->json(compact('token'));
+        $status = true;
+        return response()->json(compact('token', 'status'), 200);
     }
 
     public function register(Request $request)
     {
-            $validator = Validator::make($request->all(), [
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'user_type' => 'required',
-        ]);
+        ];
+
+        $messages = [
+            'name.required' => 209,
+            'name.string' => 210,
+            'name.max' => 211,
+            'email.required' => 212,
+            'email.unique' => 213,
+            'email.email' => 214,
+            'email.string' => 215,
+            'password.required' => 216,
+            'password.string' => 217,
+            'password.min' => 218,
+            'password.confirmed' => 219,
+            'user_type.required' => 220,
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);    
 
         if($validator->fails()){
-                return response()->json($validator->errors()->toJson(), 400);
+                return response()->json(['status' => false, $validator->errors()], 400);
         }
 
         $user = User::create([
@@ -47,8 +64,8 @@ class UserController extends Controller
         ]);
 
         $token = JWTAuth::fromUser($user);
-
-        return response()->json(compact('user','token'),201);
+        $status =true; 
+        return response()->json(compact('user','token', 'status'),200);
     }
 
     public function getAuthenticatedUser()
