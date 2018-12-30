@@ -120,17 +120,17 @@ class UserController extends Controller
         }
         // If email address Exist
         // 5) Send Account Registration Confirmation to Super Admin
-        $url = url('/password/change/?email=' . GeneralFunctions::encryptString($req->input('email'));
-            $data = [
-                'subject'         => 'Forget Password',
-                'heading_details' => 'Forget Password',
-                'sub_heading'     => 'You Forget ur Password. Please Check below',
-                'heading'         => 'Password Change',
-                'title'           => 'You Forget your Password. Please clike on the link below to change password to new one...',
-                'content'         => "<a href='" . $url . "' class='btn btn-success'> ClickHere </a> ",
-                'email'           => $req->input('email'),
-            ];
-            $sendEmail = GeneralFunctions::sendEmail($data);
-            return response()->json(['status' => true], 200);
-        }
+        $url  = url('/password/change/?email=' . GeneralFunctions::encryptString($req->input('email')));
+        $data = [
+            'subject'         => 'Forget Password',
+            'heading_details' => 'Forget Password',
+            'sub_heading'     => 'You Forget ur Password. Please Check below',
+            'heading'         => 'Password Change',
+            'title'           => 'You Forget your Password. Please clike on the link below to change password to new one...',
+            'content'         => "<a href='" . $url . "' class='btn btn-success'> ClickHere </a> ",
+            'email'           => $req->input('email'),
+        ];
+        $sendEmail = GeneralFunctions::sendEmail($data);
+        return response()->json(['status' => true], 200);
     }
+}
