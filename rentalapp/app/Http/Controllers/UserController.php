@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use GeneralFunctions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use JWTAuth;
@@ -133,4 +134,55 @@ class UserController extends Controller
         $sendEmail = GeneralFunctions::sendEmail($data);
         return response()->json(['status' => true], 200);
     }
+
+    /**
+     *
+     * Page Show for the change Password Form
+     *
+     */
+    public function showForgetPasswordPage(Request $req)
+    {
+        $data['status'] = false;
+        if (!$req->email) {
+            return view('custom_layouts.layout.forget_password_form', $data);
+        }
+        // Get User Record
+        $emailAddress = Crypt::decryptString($req->email);
+        $userDetails  = User::where('email', $emailAddress)->select('id')->get();
+        $userDetails  = $userDetails->toArray();
+        if (count($userDetails) == 0) {
+            return view('custom_layouts.layout.forget_password_form', $data);
+        }
+        // Return Form With Unique Id
+        $data['status'] = true;
+        $data['userId'] = $userDetails[0]['id'];
+        return view('custom_layouts.layout.forget_password_form', $data);
+    }
+
+    /**
+     *
+     * New Password Save Function
+     *
+     */
+    public function savePassword(Request $req)
+    {
+        // 1) Validations
+        $validationArray = [
+            'id'       => 'required',
+            'password' => 'required|min:6|confirmed',
+        ];
+        $customMessages = [
+            'password.required'  => 'Password is required',
+            'password.min'       => 'Password should be minimum 6 character long',
+            'password.confirmed' => 'Password does not match with confirm password',
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $customMessages);
+        if ($validator->fails()) {
+            return back()->withErrors($validator);
+        }
+        // Save Record
+        $saveRecord = User::where('id', Crypt::decryptString($req->id))->update(['password' => Hash::make($request->password)]);
+        return back()->with('success', 'Your Account is updated with new password. Please try with new credentials. Thanks');
+    }
+
 }
