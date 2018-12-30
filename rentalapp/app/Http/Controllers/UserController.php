@@ -181,7 +181,7 @@ class UserController extends Controller
             return back()->withErrors($validator);
         }
         // Save Record
-        $saveRecord = User::where('id', Crypt::decryptString($req->id))->update(['password' => Hash::make($request->password)]);
+        $saveRecord = User::where('id', Crypt::decryptString($req->id))->update(['password' => Hash::make($req->password)]);
         return back()->with('success', 'Your Account is updated with new password. Please try with new credentials. Thanks');
     }
 
