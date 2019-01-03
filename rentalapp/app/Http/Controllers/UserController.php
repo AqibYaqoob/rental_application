@@ -19,13 +19,13 @@ class UserController extends Controller
 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['status' => false, 'code' => 207], 400);
+                return response()->json(['status' => false, 'code' => 207]);
             }
         } catch (JWTException $e) {
-            return response()->json(['status' => false, 'code' => 208], 400);
+            return response()->json(['status' => false, 'code' => 208]);
         }
         $status = true;
-        return response()->json(compact('token', 'status'), 200);
+        return response()->json(compact('token', 'status'));
     }
 
     public function register(Request $request)
@@ -56,7 +56,7 @@ class UserController extends Controller
 
         $errors = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'errors' => $errors], 400);
+            return response()->json(['status' => 'false', 'data' => $errors]);
         }
 
         $user = User::create([
@@ -67,8 +67,9 @@ class UserController extends Controller
         ]);
 
         $token  = JWTAuth::fromUser($user);
+        $data   = ['user' => $user, 'token' => $token];
         $status = true;
-        return response()->json(compact('user', 'token', 'status'), 200);
+        return response()->json(compact('data', 'status'));
     }
 
     public function getAuthenticatedUser()
@@ -112,12 +113,12 @@ class UserController extends Controller
         $validator = Validator::make($req->all(), $rules, $messages);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'errors' => $errors], 400);
+            return response()->json(['status' => 'false', 'data' => $errors]);
         }
         // check if the Email exist in the System
         $checkEmailExist = User::where('email', $req->email)->first();
         if (!$checkEmailExist) {
-            return response()->json(['status' => false, 'code' => 221], 400);
+            return response()->json(['status' => false, 'code' => 221]);
         }
         // If email address Exist
         // 5) Send Account Registration Confirmation to Super Admin
@@ -132,7 +133,7 @@ class UserController extends Controller
             'email'           => $req->input('email'),
         ];
         $sendEmail = GeneralFunctions::sendEmail($data);
-        return response()->json(['status' => true], 200);
+        return response()->json(['status' => true]);
     }
 
     /**

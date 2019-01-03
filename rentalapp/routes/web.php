@@ -16,4 +16,5 @@ Route::get('/', function () {
 });
 // Change Password
 Route::get('/password/change', 'UserController@showForgetPasswordPage');
+// Password Save Record
 Route::post('new/password/save/record', 'UserController@savePassword');
