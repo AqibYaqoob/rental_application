@@ -56,7 +56,7 @@ class UserController extends Controller
 
         $errors = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors]);
+            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
         }
 
         $user = User::create([
@@ -113,7 +113,7 @@ class UserController extends Controller
         $validator = Validator::make($req->all(), $rules, $messages);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors]);
+            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
         }
         // check if the Email exist in the System
         $checkEmailExist = User::where('email', $req->email)->first();
