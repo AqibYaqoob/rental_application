@@ -12,4 +12,14 @@ class Properties extends Model implements AuditableContract
     protected $table      = 'properties';
     protected $primaryKey = 'id';
     protected $fillable   = ['description', 'address', 'latitude', 'longitutde', 'zipcode', 'city', 'status'];
+
+    public function properties_utility()
+    {
+        return $this->hasOne(PropertiesUtility::class, 'property_id', 'id');
+    }
+
+    public function properties_files()
+    {
+        return $this->hasMany(PropertyFiles::class, 'property_id', 'id');
+    }
 }

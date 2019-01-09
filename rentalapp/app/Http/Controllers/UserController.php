@@ -16,8 +16,27 @@ class UserController extends Controller
 {
     public function authenticate(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $rules = [
+            'email'    => 'required',
+            'password' => 'required',
+        ];
 
+        $messages = [
+            'email.required'    => 212,
+            'password.required' => 216,
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        $errors = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+        }
+
+        $credentials = [
+            'email'    => $request->email,
+            'password' => $request->password,
+        ];
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['status' => false, 'code' => 207]);
@@ -25,8 +44,10 @@ class UserController extends Controller
         } catch (JWTException $e) {
             return response()->json(['status' => false, 'code' => 208]);
         }
-        $status = true;
-        return response()->json(compact('token', 'status'));
+        $userRecord = User::where('email', $request->email)->first();
+        $data       = ['user' => $userRecord->toArray(), 'token' => $token];
+        $status     = true;
+        return response()->json(compact('data', 'status'));
     }
 
     public function register(Request $request)
@@ -34,7 +55,7 @@ class UserController extends Controller
         $rules = [
             'user_name' => 'required|string|max:255',
             'name'      => 'required|string|max:255',
-            'email'     => 'required|string|EmailAddress|max:255|unique:users',
+            'email'     => 'required|string|email|max:255|unique:users',
             'password'  => 'required|string|min:6|confirmed',
             'user_type' => 'required',
             'package'   => 'required',
@@ -71,10 +92,13 @@ class UserController extends Controller
             'email'     => $request->get('email'),
             'password'  => Hash::make($request->get('password')),
             'user_type' => $request->get('user_type'),
+            'TenantId'  => 1,
+            'Username'  => $request->get('user_name'),
+            'Roles'     => 4,
         ]);
 
         // Save Package Details
-        $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $req->package]);
+        $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
 
         $token  = JWTAuth::fromUser($user);
         $data   = ['user' => $user, 'token' => $token];

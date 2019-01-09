@@ -98,4 +98,26 @@ class PropertyController extends Controller
 
     }
 
+    // Landloard Property Details
+    public function get_landloard_properties(Request $req)
+    {
+        $validationArray = [
+            'user_id' => 'required',
+        ];
+        $rules = [
+            'user_id.required' => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+        }
+        // Get Result Record
+        $record = Property::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->first();
+        if ($record) {
+            return response()->json(['status' => true, 'data' => $record->toArray()]);
+        } else {
+            return response()->json(['status' => false, 'code' => 235]);
+        }
+    }
 }
