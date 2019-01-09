@@ -29,6 +29,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     // Authenticate User
     Route::get('user', 'UserController@getAuthenticatedUser');
     Route::get('closed', 'DataController@closed');
+    Route::get('get/all/non_rented/properties', 'PropertyController@get_all_non_rented_properties');
     // Route::get('get/cities/info', 'UserController@getCities');
     /*=================================================
     =            Owner Manager Api Details            =

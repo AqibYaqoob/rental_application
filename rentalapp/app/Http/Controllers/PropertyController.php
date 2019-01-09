@@ -116,11 +116,29 @@ class PropertyController extends Controller
             return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
         }
         // Get Result Record
-        $record = Properties::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->first();
-        if ($record) {
-            return response()->json(['status' => true, 'data' => $record->toArray()]);
+        $record = Properties::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->get();
+        $record = $record->toArray();
+        if (count($record > 0)) {
+            return response()->json(['status' => true, 'data' => $record]);
         } else {
             return response()->json(['status' => false, 'code' => 235]);
         }
     }
+
+    /**
+     *
+     * Get All Properties which are not on Rented right now to show to the Applicant
+     *
+     */
+    public function get_all_non_rented_properties(Request $req)
+    {
+        $record = Properties::with('properties_utility')->with('properties_files')->where('status', 0)->get();
+        $record = $record->toArray();
+        if (count($record) > 0) {
+            return response()->json(['status' => true, 'data' => $record]);
+        } else {
+            return response()->json(['status' => false, 'code' => 235]);
+        }
+    }
+
 }
