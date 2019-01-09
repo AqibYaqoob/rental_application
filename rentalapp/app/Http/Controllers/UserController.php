@@ -34,6 +34,11 @@ class UserController extends Controller
             return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
         }
 
+        // check if there is user Authenticated already
+        $getUser = User::where('email', $req->email)->where('otp_check', 1)->first();
+        if (!$getUser) {
+            return response()->json(['status' => 'false', 'code' => 240]);
+        }
         $credentials = [
             'email'    => $request->email,
             'password' => $request->password,
@@ -267,6 +272,8 @@ class UserController extends Controller
         // Verify User First
         $getUser = User::where('otp_code', $req->otp_code)->where('id', $req->user_id)->first();
         if ($getUser) {
+            // Update OTP Check
+            User::where('id', $req->user_id)->update(['otp_check' => 1]);
             $token  = JWTAuth::fromUser($getUser);
             $data   = ['user' => $getUser, 'token' => $token];
             $status = true;
