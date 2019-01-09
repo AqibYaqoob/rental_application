@@ -116,7 +116,7 @@ class PropertyController extends Controller
             return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
         }
         // Get Result Record
-        $record = Property::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->first();
+        $record = Properties::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->first();
         if ($record) {
             return response()->json(['status' => true, 'data' => $record->toArray()]);
         } else {
