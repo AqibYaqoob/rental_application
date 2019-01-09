@@ -283,4 +283,48 @@ class UserController extends Controller
         }
     }
 
+    /**
+     *
+     * Resend OTP Code again
+     *
+     */
+    public function resendOtpCode(Request $req)
+    {
+        $rules = [
+            'email'   => 'required',
+            'user_id' => 'required|numeric',
+        ];
+
+        $messages = [
+            'email.required'   => 212,
+            'user_id.required' => 234,
+        ];
+        $validator = Validator::make($req->all(), $rules, $messages);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+        }
+        $otpCode = mt_rand(10000, 99999);
+        // Update New Code and Send Email Address.
+        User::where('id', $req->user_id)->where('email', $req->email)->update(['otp_code' => $otpCode, 'otp_check' => 0]);
+        $user = User::where('id', $req->user_id)->get()->toArray();
+
+        // Send Email Varification Code.
+        $data = [
+            'subject'         => 'Verification',
+            'heading_details' => 'Email Verification (OTP Code)',
+            'sub_heading'     => 'Secret Code for Verification',
+            'heading'         => 'Code is used for verification of the email address and user account',
+            'title'           => 'Please add the code below in the OTP Code section to verify yourself. Also please Note that this code will valid till 4 days. After that this code will be expired. So you need to verify the email again.',
+            'content'         => "<h3><b>" . $otpCode . "</b></h3>",
+            'email'           => $req->input('email'),
+        ];
+        $sendEmail = GeneralFunctions::sendEmail($data);
+        // $token     = JWTAuth::fromUser($user);
+        $data   = ['user' => $user, 'code' => 236, 'msg' => 'Please Check your email address, Verification code is sent'];
+        $status = true;
+        return response()->json(compact('data', 'status'));
+
+    }
+
 }

@@ -24,6 +24,7 @@ Route::get('open', 'DataController@open');
 Route::get('get/packages/detail', 'PackageController@list');
 Route::get('get/cities/info', 'UserController@getCities');
 Route::post('verify/user/code', 'UserController@verifyUser');
+Route::post('resend/otp/code', 'UserController@resendOtpCode');
 Route::group(['middleware' => ['jwt.verify']], function () {
     // Authenticate User
     Route::get('user', 'UserController@getAuthenticatedUser');
