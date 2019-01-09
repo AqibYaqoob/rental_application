@@ -23,6 +23,7 @@ Route::post('forget/password', 'UserController@forget_password');
 Route::get('open', 'DataController@open');
 Route::get('get/packages/detail', 'PackageController@list');
 Route::get('get/cities/info', 'UserController@getCities');
+Route::post('verify/user/code', 'UserController@verifyUser');
 Route::group(['middleware' => ['jwt.verify']], function () {
     // Authenticate User
     Route::get('user', 'UserController@getAuthenticatedUser');

@@ -87,8 +87,8 @@ class UserController extends Controller
         if (count($errors) > 0) {
             return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
         }
-
-        $user = User::create([
+        $otpCode = mt_rand(10000, 99999);
+        $user    = User::create([
             'name'      => $request->get('name'),
             'email'     => $request->get('email'),
             'password'  => Hash::make($request->get('password')),
@@ -96,13 +96,24 @@ class UserController extends Controller
             'TenantId'  => 1,
             'Username'  => $request->get('user_name'),
             'Roles'     => 4,
+            'otp_code'  => $otpCode,
         ]);
 
         // Save Package Details
         $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
-
-        $token  = JWTAuth::fromUser($user);
-        $data   = ['user' => $user, 'token' => $token];
+        // Send Email Varification Code.
+        $data = [
+            'subject'         => 'Verification',
+            'heading_details' => 'Email Verification (OTP Code)',
+            'sub_heading'     => 'Secret Code for Verification',
+            'heading'         => 'Code is used for verification of the email address and user account',
+            'title'           => 'Please add the code below in the OTP Code section to verify yourself. Also please Note that this code will valid till 4 days. After that this code will be expired. So you need to verify the email again.',
+            'content'         => "<h3><b>" . $otpCode . "</b></h3>",
+            'email'           => $request->input('email'),
+        ];
+        $sendEmail = GeneralFunctions::sendEmail($data);
+        // $token     = JWTAuth::fromUser($user);
+        $data   = ['user' => $user, 'code' => 236, 'msg' => 'Please Check your email address, Verification code is sent'];
         $status = true;
         return response()->json(compact('data', 'status'));
     }
@@ -229,6 +240,40 @@ class UserController extends Controller
     {
         $record = Cities::get();
         return response()->json(['status' => true, 'data' => $record->toArray()]);
+    }
+
+    /**
+     *
+     * Send OTP Code to Verify and Login
+     *
+     */
+    public function verifyUser(Request $req)
+    {
+        $rules = [
+            'otp_code' => 'required|numeric',
+            'user_id'  => 'required|numeric',
+        ];
+
+        $messages = [
+            'otp_code.required' => 237,
+            'otp_code.numeric'  => 238,
+            'user_id.required'  => 234,
+        ];
+        $validator = Validator::make($req->all(), $rules, $messages);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+        }
+        // Verify User First
+        $getUser = User::where('otp_code', $req->otp_code)->where('id', $req->user_id)->first();
+        if ($getUser) {
+            $token  = JWTAuth::fromUser($getUser);
+            $data   = ['user' => $getUser, 'token' => $token];
+            $status = true;
+            return response()->json(compact('data', 'status'));
+        } else {
+            return response()->json(['status' => false, 'code' => 239]);
+        }
     }
 
 }
