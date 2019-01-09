@@ -26,6 +26,7 @@ class PropertyController extends Controller
             'zipcode'     => 'required|numeric',
             'city'        => 'required',
             'main_image'  => 'required|mimes:jpeg,jpg,png,gif|max:10000',
+            'user_id'     => 'required',
         ];
         $rules = [
             'description.required' => 222,
@@ -40,6 +41,7 @@ class PropertyController extends Controller
             'main_image.required'  => 231,
             'main_image.mimes'     => 232,
             'main_image.max'       => 233,
+            'user_id.required'     => 234,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
@@ -54,6 +56,7 @@ class PropertyController extends Controller
             'longitutde'  => $req->longitutde,
             'zipcode'     => $req->zipcode,
             'city'        => $req->city,
+            'user_id'     => $req->user_id,
         ];
         $saveProperty = Properties::create($propertDetail);
         // 2) Properties Utilities

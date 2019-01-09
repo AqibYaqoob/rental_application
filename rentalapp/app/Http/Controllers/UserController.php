@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cities;
 use App\User;
 use App\UserPackages;
 use GeneralFunctions;
@@ -218,6 +219,16 @@ class UserController extends Controller
         // Save Record
         $saveRecord = User::where('id', Crypt::decryptString($req->id))->update(['password' => Hash::make($req->password)]);
         return back()->with('success', 'Your Account is updated with new password.');
+    }
+    /**
+     *
+     * Get All Cities Record
+     *
+     */
+    public function getCities(Request $req)
+    {
+        $record = Cities::get();
+        return response()->json(['status' => true, 'data' => $record->toArray()]);
     }
 
 }

@@ -11,7 +11,7 @@ class Properties extends Model implements AuditableContract
     use Auditable;
     protected $table      = 'properties';
     protected $primaryKey = 'id';
-    protected $fillable   = ['description', 'address', 'latitude', 'longitutde', 'zipcode', 'city', 'status'];
+    protected $fillable   = ['description', 'address', 'latitude', 'longitutde', 'zipcode', 'city', 'status', 'user_id'];
 
     public function properties_utility()
     {

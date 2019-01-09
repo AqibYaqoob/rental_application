@@ -22,11 +22,12 @@ Route::post('login', 'UserController@authenticate');
 Route::post('forget/password', 'UserController@forget_password');
 Route::get('open', 'DataController@open');
 Route::get('get/packages/detail', 'PackageController@list');
-
+Route::get('get/cities/info', 'UserController@getCities');
 Route::group(['middleware' => ['jwt.verify']], function () {
     // Authenticate User
     Route::get('user', 'UserController@getAuthenticatedUser');
     Route::get('closed', 'DataController@closed');
+    // Route::get('get/cities/info', 'UserController@getCities');
     /*=================================================
     =            Owner Manager Api Details            =
     =================================================*/
