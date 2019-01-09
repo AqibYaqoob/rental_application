@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\UserPackages;
 use GeneralFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -31,10 +32,12 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $rules = [
+            'user_name' => 'required|string|max:255',
             'name'      => 'required|string|max:255',
-            'email'     => 'required|string|email|max:255|unique:users',
+            'email'     => 'required|string|EmailAddress|max:255|unique:users',
             'password'  => 'required|string|min:6|confirmed',
             'user_type' => 'required',
+            'package'   => 'required',
         ];
 
         $messages = [
@@ -50,6 +53,10 @@ class UserController extends Controller
             'password.min'       => 218,
             'password.confirmed' => 219,
             'user_type.required' => 220,
+            'package.required'   => 234,
+            'user_name.required' => 209,
+            'user_name.string'   => 210,
+            'user_name.max'      => 211,
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -65,6 +72,9 @@ class UserController extends Controller
             'password'  => Hash::make($request->get('password')),
             'user_type' => $request->get('user_type'),
         ]);
+
+        // Save Package Details
+        $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $req->package]);
 
         $token  = JWTAuth::fromUser($user);
         $data   = ['user' => $user, 'token' => $token];

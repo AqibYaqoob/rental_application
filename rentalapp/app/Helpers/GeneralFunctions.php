@@ -295,4 +295,21 @@ class GeneralFunctions
         }
     }
 
+    /**
+     *
+     * Block : Upload Files
+     *
+     */
+    public static function uploadFile($file)
+    {
+        $destinationPath = 'uploads';
+        // Expload and Add Time Stamp
+        $fileName              = explode('.', $file->getClientOriginalName());
+        $fileNameWithTimeStamp = $fileName[0] . '_' . time() . '.' . $fileName[1];
+        $file->move($destinationPath, $fileNameWithTimeStamp);
+
+        $record = ['file_name' => $fileName[0], 'file_extention' => $file->getClientOriginalExtension(), 'url' => '/uploads/' . $fileNameWithTimeStamp];
+        return $record;
+    }
+
 }

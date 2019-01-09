@@ -13,7 +13,7 @@ class Currency extends Model implements AuditableContract
     use SoftDeletes;
     protected $primaryKey = 'Id';
     protected $fillable   = ['CurrencyName', 'Tenant_Id', 'isBaseCurrency', 'deleted_at', 'CurrentRate'];
-    protected $dates = ['deleted_at'];
+    protected $dates      = ['deleted_at'];
     public function currencyList()
     {
         return $this->belongsTo('App\CurrencyList', 'currency_id', 'id');

@@ -21,8 +21,20 @@ Route::post('register', 'UserController@register');
 Route::post('login', 'UserController@authenticate');
 Route::post('forget/password', 'UserController@forget_password');
 Route::get('open', 'DataController@open');
+Route::get('get/packages/detail', 'PackageController@list');
 
 Route::group(['middleware' => ['jwt.verify']], function () {
+    // Authenticate User
     Route::get('user', 'UserController@getAuthenticatedUser');
     Route::get('closed', 'DataController@closed');
+    /*=================================================
+    =            Owner Manager Api Details            =
+    =================================================*/
+    Route::group(['prefix' => 'owner'], function () {
+        /*----------  Landloard Owner Properties Detail  ----------*/
+        // 1) Add New Property Detail
+        Route::post('add/property', 'PropertyController@add_property');
+    });
+    /*=====  End of Owner Manager Api Details  ======*/
+
 });
