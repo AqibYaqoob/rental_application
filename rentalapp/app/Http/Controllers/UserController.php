@@ -35,7 +35,7 @@ class UserController extends Controller
         }
 
         // check if there is user Authenticated already
-        $getUser = User::where('email', $req->email)->where('otp_check', 1)->first();
+        $getUser = User::where('email', $request->email)->where('otp_check', 1)->first();
         if (!$getUser) {
             return response()->json(['status' => 'false', 'code' => 240]);
         }
