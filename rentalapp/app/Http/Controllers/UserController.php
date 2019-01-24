@@ -91,11 +91,11 @@ class UserController extends Controller
 
         // If Contractor getting Register Do following operations
         if ($request->input('user_type') == 3) {
-            $rule['phone_number']            = 'required|string';
-            $rule['social_security_number']  = 'required|numeric';
-            $rule['skills_set']              = 'required';
-            $rule['reference_email_address'] = 'required';
-            $rule['reference_phone_number']  = 'required|numeric';
+            $rules['phone_number']            = 'required|string';
+            $rules['social_security_number']  = 'required|numeric';
+            $rules['skills_set']              = 'required';
+            $rules['reference_email_address'] = 'required';
+            $rules['reference_phone_number']  = 'required|numeric';
         }
 
         $validator = Validator::make($request->all(), $rules, $messages);
