@@ -33,6 +33,8 @@ class DashboardController extends Controller
         $data['active_staff_members']    = User::where([['AccountStatus', 1], ['Roles', 1], ['isAdmin', 0]])->get()->toArray();
         $data['pending_tenant_accounts'] = User::where([['AccountStatus', 0], ['Roles', 1], ['isAdmin', 0], ['account_type', 0]])->get()->toArray();
         $data['record']->toArray();
+        $data['ownersRecord']     = User::where('user_type', 1)->get()->toArray();
+        $data['contractorRecord'] = User::where('user_type', 2)->get()->toArray();
 
         return view('super_admin_portal.layouts.dashboard.dashboard', $data);
     }

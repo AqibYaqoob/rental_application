@@ -37,45 +37,67 @@
                     <div class="card">
                         <div class="card-header">
                             <i class="fa fa-align-justify"></i>
-                            Pending Containers Information
+                            List of Active Land Loards
                         </div>
                         <div class="card-body">
                             <table class="table table-responsive-sm table-bordered table-striped table-sm">
                                 <thead>
                                 <tr>
                                   <th>Details</th>
-                                  <th>Company Name</th>
                                   <th>User Name</th>
+                                  <th>Full Name</th>
                                   <th>Date registered</th>
                                   <th>Email</th>
-                                  <th>Status</th>
-                                  <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                  @foreach($record as $key => $value)
+                                  @foreach($ownersRecord as $key => $value)
                                 <tr>
-                                    <td><a href="{{route('company.details', ['id' => \Illuminate\Support\Facades\Crypt::encryptString($value->id)])}}"><i class="fa fa-info"></i> Details</a></td>
-                                    <td>{{$value['company_name']['TenantName']}}</td>
+                                   @php
+                                      $url = '/admin/user_details?id='.GeneralFunctions::encryptString($value['id']);
+                                    @endphp
+                                    <td><a href="{{ url($url)}}"><i class="fa fa-info"></i> Details</a></td>
                                     <td>{{$value['Username']}}</td>
+                                    <td>{{$value['name']}}</td>
                                     <td>{!! GeneralFunctions::convertToDateTimeToString($value['created_at']) !!}</td>
-                                    <td>{{$value['EmailAddress']}}</td>
-                                    <td>
-                                        <span class="badge badge-danger">Pending</span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <button id="btnGroupDrop1" type="button"
-                                                    class="btn btn-secondary btn-sm dropdown-toggle"
-                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Action
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                <a class="dropdown-item account_status" data-state="1" id="{{$value->id}}"><i class="fa fa-circle"></i> Approve</a>
-                                                <a class="dropdown-item account_status" data-state="0" id="{{$value->id}}"><i class="fa fa-times-circle"></i> Reject</a>
-                                            </div>
-                                        </div>
-                                    </td>
+                                    <td>{{$value['email']}}</td>
+                                </tr>
+                            @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fa fa-align-justify"></i>
+                            List of Active Contractors
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-responsive-sm table-bordered table-striped table-sm">
+                                <thead>
+                                <tr>
+                                  <th>Details</th>
+                                  <th>User Name</th>
+                                  <th>Full Name</th>
+                                  <th>Date registered</th>
+                                  <th>Email</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                  @foreach($contractorRecord as $key => $value)
+                                <tr>
+                                    @php
+                                      $url = '/admin/user_details?id='.GeneralFunctions::encryptString($value['id']);
+                                    @endphp
+                                    <td><a href="{{ url($url) }}"><i class="fa fa-info"></i> Details</a></td>
+                                    <td>{{$value['Username']}}</td>
+                                    <td>{{$value['name']}}</td>
+                                    <td>{!! GeneralFunctions::convertToDateTimeToString($value['created_at']) !!}</td>
+                                    <td>{{$value['email']}}</td>
                                 </tr>
                             @endforeach
                                 </tbody>

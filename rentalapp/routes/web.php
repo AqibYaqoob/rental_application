@@ -94,6 +94,26 @@ Route::group(['middleware' => ['localization']], function () {
                 Route::post('/raw_item/save/record', 'SuperAdminControllers\RawItemsController@save');
                 Route::get('/raw_item/list', 'SuperAdminControllers\RawItemsController@list');
                 Route::post('/raw_item/delete', 'SuperAdminControllers\RawItemsController@delete');
+                /*----------  User Packages Section  ----------*/
+                Route::get('packages_form', 'SuperAdminControllers\UserPackagesController@screen_display');
+                Route::post('/packages/record/validation', 'SuperAdminControllers\UserPackagesController@validation');
+                Route::post('/packages/save/record', 'SuperAdminControllers\UserPackagesController@save');
+                Route::get('/packages/list', 'SuperAdminControllers\UserPackagesController@list');
+                Route::post('/packages/delete', 'SuperAdminControllers\UserPackagesController@delete');
+                /*---------- Payment Options Section  ----------*/
+                Route::get('payments_form', 'SuperAdminControllers\PaymentsController@screen_display');
+                Route::post('/payments/record/validation', 'SuperAdminControllers\PaymentsController@validation');
+                Route::post('/payments/save/record', 'SuperAdminControllers\PaymentsController@save');
+                Route::get('/payments/list', 'SuperAdminControllers\PaymentsController@list');
+                Route::post('/payments/delete', 'SuperAdminControllers\PaymentsController@delete');
+                /*---------- Skill Set Section  ----------*/
+                Route::get('skills_form', 'SuperAdminControllers\SkillController@screen_display');
+                Route::post('/skills/record/validation', 'SuperAdminControllers\SkillController@validation');
+                Route::post('/skills/save/record', 'SuperAdminControllers\SkillController@save');
+                Route::get('/skills/list', 'SuperAdminControllers\SkillController@list');
+                Route::post('/skills/delete', 'SuperAdminControllers\SkillController@delete');
+                /*----------  User Details  ----------*/
+                Route::get('user_details', 'UserController@user_detail_screen');
 
             });
         });

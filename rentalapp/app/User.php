@@ -104,4 +104,8 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany("App\SiteAccountShareholder", "PartnerId", "id");
     }
+    public function contractor_details()
+    {
+        return $this->hasOne(ContractorDetails::class, 'user_id', 'id');
+    }
 }

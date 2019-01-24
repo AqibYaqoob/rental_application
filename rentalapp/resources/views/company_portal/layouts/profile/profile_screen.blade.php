@@ -8,7 +8,7 @@
         $userEmail = '';
         if(isset($profile_details) && count($profile_details) > 0){
             $userName = $profile_details['Username'];
-            $userEmail = $profile_details['EmailAddress'];
+            $userEmail = $profile_details['email'];
             if($profile_details['staff_members'] != null){
                 $fullName = $profile_details['staff_members']['staff_name'];
                 $mobileNumber = $profile_details['staff_members']['mobile_number'];
@@ -229,7 +229,7 @@
                         if(data.status == 'success'){
                             list = list +'<li>Your Profile is Updated</li>';
                             $('#msg-list').html(list);
-                            $('.msg-box').addClass("alert-success").show();
+                            $('.msg-box').removeClass("alert-danger").addClass("alert-success").show();
                         }
                         else{
                             var errorArray = data.msg_data;
@@ -238,7 +238,7 @@
                             });
 
                             $('#msg-list').html(list);
-                            $('.msg-box').addClass("alert-danger").show();
+                            $('.msg-box').removeClass("alert-success").addClass("alert-danger").show();
                         }
                         $("html, .container").animate({ scrollTop: 0 }, 600);
                         $('.loading_gif').hide();
@@ -272,4 +272,4 @@
             });
         });
     </script>
-@endsection  	
+@endsection

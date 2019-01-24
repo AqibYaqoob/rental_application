@@ -14,7 +14,7 @@ class PackageController extends Controller
      */
     function list(Request $request) {
         $getPackageDetails = Packages::get()->toArray();
-        return response()->json(['status' => true, 'data' => $getPackageDetails]);
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $getPackageDetails]);
     }
 
 }

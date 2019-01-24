@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Cities;
+use App\ContractorDetails;
 use App\User;
 use App\UserPackages;
 use GeneralFunctions;
@@ -31,29 +32,31 @@ class UserController extends Controller
 
         $errors = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [400], 'successcode' => []]);
         }
 
-        // check if there is user Authenticated already
-        $getUser = User::where('email', $request->email)->where('otp_check', 1)->first();
-        if (!$getUser) {
-            return response()->json(['status' => 'false', 'code' => 240]);
-        }
         $credentials = [
             'email'    => $request->email,
             'password' => $request->password,
         ];
+        $record = User::where('email', $request->email)->first();
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['status' => false, 'code' => 207]);
+                return response()->json(['status' => false, 'data' => null, 'errorcode' => [207], 'successcode' => []]);
             }
         } catch (JWTException $e) {
-            return response()->json(['status' => false, 'code' => 208]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [208], 'successcode' => []]);
         }
-        $userRecord = User::where('email', $request->email)->first();
-        $data       = ['user' => $userRecord->toArray(), 'token' => $token];
-        $status     = true;
-        return response()->json(compact('data', 'status'));
+        // check if there is user Authenticated already
+        $getUser = User::where('email', $request->email)->where('otp_check', 1)->first();
+        if (!$getUser) {
+            return response()->json(['status' => false, 'data' => ['user' => $record->toArray(), 'token' => null], 'errorcode' => [240], 'successcode' => []]);
+        }
+        $data        = ['user' => $record->toArray(), 'token' => $token];
+        $status      = true;
+        $errorcode   = [];
+        $successcode = [200];
+        return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
     }
 
     public function register(Request $request)
@@ -80,17 +83,26 @@ class UserController extends Controller
             'password.min'       => 218,
             'password.confirmed' => 219,
             'user_type.required' => 220,
-            'package.required'   => 234,
+            'package.required'   => 250,
             'user_name.required' => 209,
             'user_name.string'   => 210,
             'user_name.max'      => 211,
         ];
 
+        // If Contractor getting Register Do following operations
+        if ($request->input('user_type') == 3) {
+            $rule['phone_number']            = 'required|string';
+            $rule['social_security_number']  = 'required|numeric';
+            $rule['skills_set']              = 'required';
+            $rule['reference_email_address'] = 'required';
+            $rule['reference_phone_number']  = 'required|numeric';
+        }
+
         $validator = Validator::make($request->all(), $rules, $messages);
 
         $errors = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => $errors, 'successcode' => []]);
         }
         $otpCode = mt_rand(10000, 99999);
         $user    = User::create([
@@ -103,9 +115,12 @@ class UserController extends Controller
             'Roles'     => 4,
             'otp_code'  => $otpCode,
         ]);
-
-        // Save Package Details
-        $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
+        if ($request->input('user_type') == 3) {
+            $contractorDetails = $this->contractorImplementation($request, $user);
+        } else {
+            // Save Package Details
+            $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
+        }
         // Send Email Varification Code.
         $data = [
             'subject'         => 'Verification',
@@ -118,9 +133,11 @@ class UserController extends Controller
         ];
         $sendEmail = GeneralFunctions::sendEmail($data);
         // $token     = JWTAuth::fromUser($user);
-        $data   = ['user' => $user, 'code' => 236, 'msg' => 'Please Check your email address, Verification code is sent'];
-        $status = true;
-        return response()->json(compact('data', 'status'));
+        $data        = ['user' => $user];
+        $status      = true;
+        $errorcode   = [];
+        $successcode = [236];
+        return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
     }
 
     public function getAuthenticatedUser()
@@ -164,12 +181,12 @@ class UserController extends Controller
         $validator = Validator::make($req->all(), $rules, $messages);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [400], 'successcode' => []]);
         }
         // check if the Email exist in the System
         $checkEmailExist = User::where('email', $req->email)->first();
         if (!$checkEmailExist) {
-            return response()->json(['status' => false, 'code' => 221]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [221], 'successcode' => []]);
         }
         // If email address Exist
         // 5) Send Account Registration Confirmation to Super Admin
@@ -184,7 +201,7 @@ class UserController extends Controller
             'email'           => $req->input('email'),
         ];
         $sendEmail = GeneralFunctions::sendEmail($data);
-        return response()->json(['status' => true]);
+        return response()->json(['status' => true, 'data' => null, 'errorcode' => [], 'successcode' => [200]]);
     }
 
     /**
@@ -244,7 +261,7 @@ class UserController extends Controller
     public function getCities(Request $req)
     {
         $record = Cities::get();
-        return response()->json(['status' => true, 'data' => $record->toArray()]);
+        return response()->json(['status' => true, 'data' => $record->toArray(), 'errorcode' => [], 'successcode' => [200]]);
     }
 
     /**
@@ -267,19 +284,21 @@ class UserController extends Controller
         $validator = Validator::make($req->all(), $rules, $messages);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [400], 'successcode' => []]);
         }
         // Verify User First
         $getUser = User::where('otp_code', $req->otp_code)->where('id', $req->user_id)->first();
         if ($getUser) {
             // Update OTP Check
             User::where('id', $req->user_id)->update(['otp_check' => 1]);
-            $token  = JWTAuth::fromUser($getUser);
-            $data   = ['user' => $getUser, 'token' => $token];
-            $status = true;
-            return response()->json(compact('data', 'status'));
+            $token       = JWTAuth::fromUser($getUser);
+            $data        = ['user' => $getUser, 'token' => $token];
+            $status      = true;
+            $errorcode   = [];
+            $successcode = [200];
+            return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
         } else {
-            return response()->json(['status' => false, 'code' => 239]);
+            return response()->json(['status' => false, 'errorcode' => [239], 'successcode' => [], 'data' => null]);
         }
     }
 
@@ -291,8 +310,8 @@ class UserController extends Controller
     public function resendOtpCode(Request $req)
     {
         $rules = [
-            'email'   => 'required',
-            'user_id' => 'required|numeric',
+            'email' => 'required',
+            // 'user_id' => 'required|numeric',
         ];
 
         $messages = [
@@ -302,12 +321,12 @@ class UserController extends Controller
         $validator = Validator::make($req->all(), $rules, $messages);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => 'false', 'data' => $errors, 'code' => 400]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => $errors, 'successcode' => []]);
         }
         $otpCode = mt_rand(10000, 99999);
         // Update New Code and Send Email Address.
-        User::where('id', $req->user_id)->where('email', $req->email)->update(['otp_code' => $otpCode, 'otp_check' => 0]);
-        $user = User::where('id', $req->user_id)->get()->toArray();
+        User::where('email', $req->email)->update(['otp_code' => $otpCode, 'otp_check' => 0]);
+        $user = User::where('email', $req->email)->get()->toArray();
 
         // Send Email Varification Code.
         $data = [
@@ -319,12 +338,51 @@ class UserController extends Controller
             'content'         => "<h3><b>" . $otpCode . "</b></h3>",
             'email'           => $req->input('email'),
         ];
-        $sendEmail = GeneralFunctions::sendEmail($data);
-        // $token     = JWTAuth::fromUser($user);
-        $data   = ['user' => $user, 'code' => 236, 'msg' => 'Please Check your email address, Verification code is sent'];
-        $status = true;
-        return response()->json(compact('data', 'status'));
+        $sendEmail   = GeneralFunctions::sendEmail($data);
+        $data        = null;
+        $status      = true;
+        $errorcode   = [];
+        $successcode = [236];
+        return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
 
+    }
+
+    // Implementation of the Contractor Details
+    public function contractorImplementation($parameters, $userRecord)
+    {
+        // 1) Add Contractor Remaining Details
+        $contractorDetails = [
+            'reference_email'        => $parameters->reference_email,
+            'reference_phone_number' => $parameters->reference_phone_number,
+            'skill_set'              => $parameters->skill_set,
+            'social_security_number' => $parameters->social_security_number,
+            'driving_licence'        => $parameters->driving_licence,
+            'user_id'                => $parameters->user_id,
+        ];
+
+        $saveContractorDetailRecord = ContractorDetails::create($contractorDetails);
+        return $saveContractorDetailRecord;
+    }
+
+    /**
+     *
+     * Profile Edit
+     *
+     */
+    public function profileEdit(Request $req)
+    {
+
+    }
+
+    /**
+     *
+     * User Detail Screen
+     *
+     */
+    public function user_detail_screen(Request $req)
+    {
+        $userDetail = User::where('id', Crypt::decryptString($req->id))->get()->toArray();
+        dd($userDetail);
     }
 
 }

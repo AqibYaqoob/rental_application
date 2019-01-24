@@ -103,74 +103,62 @@
                     <a class="nav-link" href="{{ url('/admin/audit_trail')}}"><i class="icon-puzzle"></i>{{trans('labels.audit_trail')}}</a>
                 </li>
                 @endif
-                @if(GeneralFunctions::check_view_permission('item_category_form') || GeneralFunctions::check_view_permission('item_category_list'))
+                @if(GeneralFunctions::check_view_permission('packages_form') || GeneralFunctions::check_view_permission('packages_list'))
                     <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.item_category')}} </a>
+                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.packages')}} </a>
                         <ul class="nav-dropdown-items">
-                            @if(GeneralFunctions::check_view_permission('item_category_form'))
+                            @if(GeneralFunctions::check_view_permission('packages_form'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('/admin/item_category_form') }}"><i class="icon-puzzle"></i>{{trans('labels.category_add')}} </a>
+                                    <a class="nav-link" href="{{ url('/admin/packages_form') }}"><i class="icon-puzzle"></i>{{trans('labels.add_packages')}} </a>
                                 </li>
                             @endif
-                            @if(GeneralFunctions::check_view_permission('item_category_list'))
+                            @if(GeneralFunctions::check_view_permission('packages_list'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('/admin/raw_category/list') }}"><i class="icon-puzzle"></i>{{trans('labels.category_list')}} </a>
+                                    <a class="nav-link" href="{{ url('/admin/packages/list') }}"><i class="icon-puzzle"></i>{{trans('labels.packages')}} </a>
                                 </li>
                             @endif
                         </ul>
                     </li>
                 @endif
-                @if(GeneralFunctions::check_view_permission('raw_item_form') || GeneralFunctions::check_view_permission('raw_item_list'))
+                @if(GeneralFunctions::check_view_permission('payments_form') || GeneralFunctions::check_view_permission('payments_list'))
                     <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.raw_items')}} </a>
+                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.payments')}} </a>
                         <ul class="nav-dropdown-items">
-                            @if(GeneralFunctions::check_view_permission('raw_item_form'))
+                            @if(GeneralFunctions::check_view_permission('payments_form'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('/admin/raw_item_form') }}"><i class="icon-puzzle"></i>{{trans('labels.add_raw_item')}} </a>
+                                    <a class="nav-link" href="{{ url('/admin/payments_form') }}"><i class="icon-puzzle"></i>{{trans('labels.add_payments')}} </a>
                                 </li>
                             @endif
-                            @if(GeneralFunctions::check_view_permission('raw_item_list'))
+                            @if(GeneralFunctions::check_view_permission('payments_list'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('/admin/raw_item/list') }}"><i class="icon-puzzle"></i>{{trans('labels.raw_item_list')}} </a>
+                                    <a class="nav-link" href="{{ url('/admin/payments/list') }}"><i class="icon-puzzle"></i>{{trans('labels.payments')}} </a>
                                 </li>
                             @endif
                         </ul>
                     </li>
                 @endif
-                @if(GeneralFunctions::check_view_permission('supplier_form') || GeneralFunctions::check_view_permission('supplier_list'))
+                @if(GeneralFunctions::check_view_permission('skills_form') || GeneralFunctions::check_view_permission('skills_list'))
                     <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.suppliers')}} </a>
+                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.skills')}} </a>
                         <ul class="nav-dropdown-items">
-                            @if(GeneralFunctions::check_view_permission('supplier_form'))
+                            @if(GeneralFunctions::check_view_permission('skills_form'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('/admin/supplier_form') }}"><i class="icon-puzzle"></i>{{trans('labels.add_supplier')}} </a>
+                                    <a class="nav-link" href="{{ url('/admin/skills_form') }}"><i class="icon-puzzle"></i>{{trans('labels.add_skills')}} </a>
                                 </li>
                             @endif
-                            @if(GeneralFunctions::check_view_permission('supplier_list'))
+                            @if(GeneralFunctions::check_view_permission('skills_list'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('/admin/supplier/list') }}"><i class="icon-puzzle"></i>{{trans('labels.suppliers_list')}} </a>
+                                    <a class="nav-link" href="{{ url('/admin/skills/list') }}"><i class="icon-puzzle"></i>{{trans('labels.skills')}} </a>
                                 </li>
                             @endif
                         </ul>
                     </li>
                 @endif
-                @if(GeneralFunctions::check_view_permission('admin_company_list'))
-                    <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> {{trans('labels.companies')}}</a>
-                        <ul class="nav-dropdown-items">
-                            @if(GeneralFunctions::check_view_permission('admin_company_list'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ url('admin/company_list') }}"><i class="icon-puzzle"></i> {{trans('labels.companies_list')}}</a>
-                                </li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-                @if(GeneralFunctions::check_view_permission('super_admin_company_reports'))
+                <!-- @if(GeneralFunctions::check_view_permission('super_admin_company_reports'))
                  <li class="nav-item">
                     <a class="nav-link" href="{{ url('/admin/companies_report')}}"><i class="icon-puzzle"></i>{{trans('labels.companies_reporting')}}</a>
                 </li>
-                @endif
+                @endif -->
 
             </ul>
         </nav>

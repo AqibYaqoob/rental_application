@@ -25,6 +25,10 @@ Route::get('get/packages/detail', 'PackageController@list');
 Route::get('get/cities/info', 'UserController@getCities');
 Route::post('verify/user/code', 'UserController@verifyUser');
 Route::post('resend/otp/code', 'UserController@resendOtpCode');
+Route::get('get/skill/set/detail', 'SkillSetController@list');
+// General Routes
+Route::get('get/payment/options', 'GeneralController@payment_list');
+// End of General Routes
 Route::group(['middleware' => ['jwt.verify']], function () {
     // Authenticate User
     Route::get('user', 'UserController@getAuthenticatedUser');
@@ -40,7 +44,28 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('add/property', 'PropertyController@add_property');
         // 2) Get Landloard Properties Detail
         Route::post('get/properties/all', 'PropertyController@get_landloard_properties');
+
     });
     /*=====  End of Owner Manager Api Details  ======*/
+
+    /*===============================================
+    =            Contractors Api Details            =
+    ===============================================*/
+
+    Route::group(['prefix' => 'contractor'], function () {
+        Route::post('get/all', 'ContractorController@list');
+    });
+
+    /*=====  End of Contractors Api Details  ======*/
+
+    /*=============================================
+    =            Applicant Api Details            =
+    =============================================*/
+    Route::group(['prefix' => 'applicant'], function () {
+        Route::post('add/scheduling/properties', 'PropertyController@addPropertyScheduling');
+    });
+     
+    /*=====  End of Applicant Api Details  ======*/
+    
 
 });

@@ -107,7 +107,7 @@ class ProfileController extends Controller
             StaffMember::create($contactRecord);
         }
         // 4) Update Authentication Data
-        User::where('id', Auth::user()->id)->update(['Username' => $req->input('p-user_name'), 'EmailAddress' => $req->input('p-email')]);
+        User::where('id', Auth::user()->id)->update(['Username' => $req->input('p-user_name'), 'email' => $req->input('p-email')]);
         return response()->json(['status' => 'success']);
     }
 
@@ -178,64 +178,54 @@ class ProfileController extends Controller
     /*=====  End of Section for Settings Screens Functions  ======*/
     public function updateCurrencies(Request $request)
     {
-        $this->validate($request, ['currency' => 'required|array'],['currency.required' => 'Currency is required. If you not added currency yet then please add it first']);
+        $this->validate($request, ['currency' => 'required|array'], ['currency.required' => 'Currency is required. If you not added currency yet then please add it first']);
         $baseFlag = false;
-        if(count($request->currency) == 1)
-        {
+        if (count($request->currency) == 1) {
             $object = Currency::find(key($request->currency));
-        }
-        else
-        {
+        } else {
             $object = Currency::whereBetween('id', array_keys($request->currency))->get();
         }
-        if($object->count() == 1)
-        {
-            $object->CurrentRate    = $request->currency[$object->Id];
+        if ($object->count() == 1) {
+            $object->CurrentRate = $request->currency[$object->Id];
             // if base currency is not set
-            if($object->isBaseCurrency != 1)
-            {
+            if ($object->isBaseCurrency != 1) {
                 $object->isBaseCurrency = ($object->Id == $request->baseCurrency) ? 1 : 0;
             }
             $object->save();
             return redirect()->route('profile.setting')->with('success', 'Currencies has been updated');
-        }
-        elseif($object->count() > 1)
-        {
-            foreach ($object as $currency)
-            {
-                if($currency->isBaseCurrency == 1)
-                {
+        } elseif ($object->count() > 1) {
+            foreach ($object as $currency) {
+                if ($currency->isBaseCurrency == 1) {
                     $baseFlag = true;
                 }
-                if(array_key_exists($currency->Id, $request->currency))
-                {
-                    $currency->CurrentRate    = $request->currency[$currency->Id];
-                }
-                else
-                {
+                if (array_key_exists($currency->Id, $request->currency)) {
+                    $currency->CurrentRate = $request->currency[$currency->Id];
+                } else {
                     continue;
                 }
                 // check if already base currency is set
-                if (!$baseFlag)
+                if (!$baseFlag) {
                     $currency->isBaseCurrency = ($currency->Id == $request->baseCurrency) ? 1 : 0;
+                }
+
                 $currency->save();
             }
         }
 
         /*foreach ($request->currency as $key => $currency) {
-            $object = Currency::find($key);
-            dd($object);
-            if (!is_null($object))
-            {
-                //update
-                $object->CurrentRate    = $currency;
-                $object->isBaseCurrency = ($key == $request->baseCurrency) ? 1 : 0;
-                $object->save();
-            }
-            else
-            {
-                continue;
-            }
+        $object = Currency::find($key);
+        dd($object);
+        if (!is_null($object))
+        {
+        //update
+        $object->CurrentRate    = $currency;
+        $object->isBaseCurrency = ($key == $request->baseCurrency) ? 1 : 0;
+        $object->save();
+        }
+        else
+        {
+        continue;
+        }
         }*/
         return redirect()->route('profile.setting')->with('success', 'Currencies has been updated');
     }

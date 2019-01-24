@@ -22,4 +22,9 @@ class Properties extends Model implements AuditableContract
     {
         return $this->hasMany(PropertyFiles::class, 'property_id', 'id');
     }
+
+    public function properties_schedulings()
+    {
+        return $this->hasMany(PropertyScheduling::class, 'property_id', 'id');
+    }
 }

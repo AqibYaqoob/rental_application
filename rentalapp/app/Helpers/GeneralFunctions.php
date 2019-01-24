@@ -311,5 +311,40 @@ class GeneralFunctions
         $record = ['file_name' => $fileName[0], 'file_extention' => $file->getClientOriginalExtension(), 'url' => '/uploads/' . $fileNameWithTimeStamp];
         return $record;
     }
+    /**
+     *
+     * Block : Upload Files using Base 64
+     *
+     */
+    public static function uploadFileUsingBase64($fileData)
+    {
+        $image      = base64_decode($fileData);
+        $image_name = 'file' . '_' . time() . '.png';
+        $path       = public_path() . "/uploads/" . $image_name;
+        file_put_contents($path, $image);
+        $record = ['file_name' => $image_name, 'file_extention' => 'png', 'url' => '/uploads/' . $image_name];
+        return $record;
+    }
+
+    /**
+     *
+     * Block: Convert unix timestamp into human readable format
+     *
+     */
+    public static function convertUnixToReadableFormat($val)
+    {
+
+// Grab the milliseconds as the initial value mod 1000
+        $milliseconds = $val % 1000;
+
+// Divide by 1000 to obtain the actual timestamp
+        $ts = intval($val / 1000);
+
+// Parse into a DateTime object
+        $date = DateTime::createFromFormat('U', $ts);
+
+// Formatted output
+        return $date->format('D, d M Y H:i:s');
+    }
 
 }
