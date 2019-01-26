@@ -143,6 +143,34 @@ class PropertyController extends Controller
 
     /**
      *
+     * Get Specific Property Details
+     *
+     */
+    public function get_specific_property(Request $req)
+    {
+        $validationArray = [
+            'user_id'  => 'required',
+            'property' => 'required',
+        ];
+        $rules = [
+            'user_id.required'  => 234,
+            'property.required' => 241,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        $record        = Properties::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->where('id', $req->property)->first();
+        $recordDetails = null;
+        if ($record) {
+            $recordDetails = $record->toArray();
+        }
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $recordDetails]);
+    }
+
+    /**
+     *
      * Add Scheduling for the Specific Property for Applying booking
      *
      */

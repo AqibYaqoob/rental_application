@@ -39,11 +39,13 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     =            Owner Manager Api Details            =
     =================================================*/
     Route::group(['prefix' => 'owner'], function () {
-        /*----------  Landloard Owner Properties Detail  ----------*/
+        /*----------  LandLoard Owner Properties Detail  ----------*/
         // 1) Add New Property Detail
         Route::post('add/property', 'PropertyController@add_property');
         // 2) Get Landloard Properties Detail
         Route::post('get/properties/all', 'PropertyController@get_landloard_properties');
+        // 3) Get Specific Property Details
+        Route::post('get/specific/property', 'PropertyController@get_specific_property');
 
     });
     /*=====  End of Owner Manager Api Details  ======*/
@@ -64,8 +66,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group(['prefix' => 'applicant'], function () {
         Route::post('add/scheduling/properties', 'PropertyController@addPropertyScheduling');
     });
-     
+
     /*=====  End of Applicant Api Details  ======*/
-    
 
 });
