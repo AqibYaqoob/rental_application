@@ -26,6 +26,7 @@ Route::get('get/cities/info', 'UserController@getCities');
 Route::post('verify/user/code', 'UserController@verifyUser');
 Route::post('resend/otp/code', 'UserController@resendOtpCode');
 Route::get('get/skill/set/detail', 'SkillSetController@list');
+Route::get('get/property/type/details', 'PropertyController@get_property_type_list');
 // General Routes
 Route::get('get/payment/options', 'GeneralController@payment_list');
 // End of General Routes

@@ -6,6 +6,7 @@ use App\Properties;
 use App\PropertiesUtility;
 use App\PropertyFiles;
 use App\PropertyScheduling;
+use App\PropertyType;
 use GeneralFunctions;
 use Illuminate\Http\Request;
 use Validator;
@@ -20,14 +21,15 @@ class PropertyController extends Controller
     public function add_property(Request $req)
     {
         $validationArray = [
-            'description' => 'required',
-            'address'     => 'required',
-            'latitude'    => 'required|numeric',
-            'longitude'   => 'required|numeric',
-            'zipcode'     => 'required|numeric',
-            'city'        => 'required',
-            'main_image'  => 'required|base64',
-            'user_id'     => 'required',
+            'description'   => 'required',
+            'address'       => 'required',
+            'latitude'      => 'required|numeric',
+            'longitude'     => 'required|numeric',
+            'zipcode'       => 'required|numeric',
+            'city'          => 'required',
+            'main_image'    => 'required|base64',
+            'user_id'       => 'required',
+            'property_type' => 'required',
         ];
         $rules = [
             'description.required'   => 222,
@@ -43,6 +45,7 @@ class PropertyController extends Controller
             'main_image.base64'      => 232,
             'main_image.base64image' => 233,
             'user_id.required'       => 234,
+            'property_type.required' => 258,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
@@ -51,13 +54,14 @@ class PropertyController extends Controller
         }
         // 1) Add Property Details First
         $propertDetail = [
-            'description' => $req->description,
-            'address'     => $req->address,
-            'latitude'    => $req->latitude,
-            'longitutde'  => $req->longitutde,
-            'zipcode'     => $req->zipcode,
-            'city'        => $req->city,
-            'user_id'     => $req->user_id,
+            'description'   => $req->description,
+            'address'       => $req->address,
+            'latitude'      => $req->latitude,
+            'longitutde'    => $req->longitutde,
+            'zipcode'       => $req->zipcode,
+            'city'          => $req->city,
+            'user_id'       => $req->user_id,
+            'property_type' => $req->property_type,
         ];
         $saveProperty = Properties::create($propertDetail);
         // 2) Properties Utilities
@@ -116,7 +120,7 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
         // Get Result Record
-        $record = Properties::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->get();
+        $record = Properties::with('properties_utility')->with('city_detail')->with('property_type')->with('properties_files')->where('user_id', $req->user_id)->get();
         $record = $record->toArray();
         if (count($record > 0)) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
@@ -132,7 +136,7 @@ class PropertyController extends Controller
      */
     public function get_all_non_rented_properties(Request $req)
     {
-        $record = Properties::with('properties_utility')->with('properties_files')->where('status', 0)->get();
+        $record = Properties::with('properties_utility')->with('properties_files')->with('city_detail')->with('property_type')->where('status', 0)->get();
         $record = $record->toArray();
         if (count($record) > 0) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
@@ -160,7 +164,7 @@ class PropertyController extends Controller
         if (count($errors) > 0) {
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
-        $record        = Properties::with('properties_utility')->with('properties_files')->where('id', $req->property)->first();
+        $record        = Properties::with('properties_utility')->with('properties_files')->with('city_detail')->with('property_type')->where('id', $req->property)->first();
         $recordDetails = null;
         if ($record) {
             $recordDetails = $record->toArray();
@@ -427,6 +431,21 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
         }
 
+    }
+
+    /**
+     *
+     * Block : Get Property Type List
+     *
+     */
+    public function get_property_type_list(Request $req)
+    {
+        $getPropertyTypeDetails = PropertyType::get()->toArray();
+        if (count($getPropertyTypeDetails) > 0) {
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $getPropertyTypeDetails]);
+        } else {
+            return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+        }
     }
 
 }
