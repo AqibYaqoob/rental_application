@@ -21,31 +21,33 @@ class PropertyController extends Controller
     public function add_property(Request $req)
     {
         $validationArray = [
-            'description'   => 'required',
-            'address'       => 'required',
-            'latitude'      => 'required|numeric',
-            'longitude'     => 'required|numeric',
-            'zipcode'       => 'required|numeric',
-            'city'          => 'required',
-            'main_image'    => 'required|base64',
-            'user_id'       => 'required',
-            'property_type' => 'required',
+            'description'                => 'required',
+            'address'                    => 'required',
+            'latitude'                   => 'required|numeric',
+            'longitude'                  => 'required|numeric',
+            'zipcode'                    => 'required|numeric',
+            'city'                       => 'required',
+            'main_image'                 => 'required|base64',
+            'user_id'                    => 'required',
+            'property_type'              => 'required',
+            'property_related_questions' => 'required',
         ];
         $rules = [
-            'description.required'   => 222,
-            'address.required'       => 223,
-            'latitude.required'      => 224,
-            'latitude.numeric'       => 225,
-            'longitude.required'     => 226,
-            'longitude.numeric'      => 227,
-            'zipcode.required'       => 228,
-            'zipcode.numeric'        => 229,
-            'city.required'          => 230,
-            'main_image.required'    => 231,
-            'main_image.base64'      => 232,
-            'main_image.base64image' => 233,
-            'user_id.required'       => 234,
-            'property_type.required' => 258,
+            'description.required'                => 222,
+            'address.required'                    => 223,
+            'latitude.required'                   => 224,
+            'latitude.numeric'                    => 225,
+            'longitude.required'                  => 226,
+            'longitude.numeric'                   => 227,
+            'zipcode.required'                    => 228,
+            'zipcode.numeric'                     => 229,
+            'city.required'                       => 230,
+            'main_image.required'                 => 231,
+            'main_image.base64'                   => 232,
+            'main_image.base64image'              => 233,
+            'user_id.required'                    => 234,
+            'property_type.required'              => 258,
+            'property_related_questions.required' => 259,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
@@ -94,7 +96,7 @@ class PropertyController extends Controller
                 $savePropertyImagesRecord[$keyValue] = [
                     'file_name'   => $uploadMainFile['file_name'],
                     'file_path'   => $uploadMainFile['url'],
-                    'property_id' => $saveProperty->id,
+                    'property_id' => $saveProperty->id;
                     'main_img'    => 0,
                     'created_at'  => Date('Y-m-d'),
                     'updated_at'  => Date('Y-m-d'),
@@ -102,6 +104,25 @@ class PropertyController extends Controller
             }
         }
         $savePropertyFileRecord = PropertyFiles::insert($savePropertyImagesRecord);
+        if ($req->property_related_questions == 1) {
+            // Added Property Related Questions
+            if (is_array($req->questions)) {
+                if (count($req->questions) > 0) {
+                    if (count($req->questions) > 4) {
+                        return response()->json(['status' => false, 'errorcode' => [262], 'successcode' => [], 'data' => null]);
+                    }
+                    $propertyQuestions['property_id'] = $saveProperty->id;
+                    foreach ($req->questions as $key => $value) {
+                        $propertyQuestions['property_question_' . $key + 1] = $value;
+                    }
+                    PropertyRelatedQuestions::create($propertyQuestions);
+                } else {
+                    return response()->json(['status' => false, 'errorcode' => [260], 'successcode' => [], 'data' => null]);
+                }
+            } else {
+                return response()->json(['status' => false, 'errorcode' => [261], 'successcode' => [261], 'data' => null]);
+            }
+        }
         return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
     }
 
@@ -448,4 +469,10 @@ class PropertyController extends Controller
         }
     }
 
+    /**
+     *
+     * Block comment
+     *
+     */
+    function
 }
