@@ -228,7 +228,7 @@ class PropertyController extends Controller
             'user_id.required'             => 234,
             'new_scheduling_time.required' => 244,
             'new_scheduling_time.numeric'  => 246,
-            'scheduling_id.required'       => 245,
+            'scheduling_id.required'       => 254,
             'applicant_id.required'        => 247,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
@@ -245,7 +245,7 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => [248], 'successcode' => [], 'data' => null]);
         }
         // 2) Check for the time which is booked first. Against which you wnat to reschedule the time
-        $getRecord = PropertyScheduling::with('property_detail')->where('id', $req->scheduling_id)->first();
+        $getRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('id', $req->scheduling_id)->where('status', 1)->first();
         if ($getRecord) {
             // Update the New Timing and update Applicant through Notification and Email
 
@@ -263,7 +263,7 @@ class PropertyController extends Controller
             $sendEmail = GeneralFunctions::sendEmail($data);
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
         } else {
-            return response()->json(['status' => false, 'errorcode' => [246], 'successcode' => [], 'data' => null]);
+            return response()->json(['status' => false, 'errorcode' => [257], 'successcode' => [], 'data' => null]);
         }
     }
 

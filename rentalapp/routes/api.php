@@ -52,6 +52,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('property/booking/details', 'PropertyController@booking_details');
         // 6) Add Showing Booking Details
         Route::post('property/booking/add', 'PropertyController@add_booking_for_specific_property');
+        // 7) Add Showing Booking Details
+        Route::post('property/booking/reschedule', 'PropertyController@reScheduleProperty');
     });
     /*=====  End of Owner Manager Api Details  ======*/
 
