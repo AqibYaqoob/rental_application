@@ -348,4 +348,85 @@ class PropertyController extends Controller
         }
     }
 
+    /**
+     *
+     * Show Booking details for a specific property
+     *
+     */
+    public function booking_details(Request $req)
+    {
+        $validationArray = [
+            'property' => 'required',
+            'user_id'  => 'required',
+        ];
+        $rules = [
+            'property.required' => 241,
+            'user_id.required'  => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+
+        $getUserRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->where('status', 1)->first();
+        if ($getUserRecord) {
+            $getUserRecord = $getUserRecord->toArray();
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $getUserRecord]);
+
+        } else {
+            return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+        }
+    }
+
+    /**
+     *
+     * Add Booking for Specific Property
+     *
+     */
+    public function add_booking_for_specific_property(Request $req)
+    {
+        $validationArray = [
+            'property'      => 'required',
+            'user_id'       => 'required',
+            'scheduling_id' => 'required',
+        ];
+        $rules = [
+            'property.required'      => 241,
+            'user_id.required'       => 234,
+            'scheduling_id.required' => 254,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        // Check if the booking already exist for the scheduling
+        $getRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('id', $req->scheduling_id)->where('status', 1)->first();
+        if ($getRecord) {
+            return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+        }
+        $getNewRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('id', $req->scheduling_id)->first();
+        if ($getNewRecord)
+        // Get Applicant Email Address
+        {
+            $data = [
+                'subject'         => 'Booking for Showing Property',
+                'heading_details' => 'Showing Property (' . $getNewRecord->property_detail->description . ')',
+                'sub_heading'     => '',
+                'heading'         => 'Time for Showing Property',
+                'title'           => 'Your timing for showing the property is given below',
+                'content'         => "<h3><b>" . GeneralFunctions::convertUnixToReadableFormat($getNewRecord->availibility_date_time) . "</b></h3>",
+                'email'           => $getNewRecord->applicant->email,
+            ];
+            $sendEmail = GeneralFunctions::sendEmail($data);
+            // Add Booking for Showing property
+            $updateShowings = PropertyScheduling::where('id', $req->scheduling_id)->update(['status' => 1]);
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [256], 'data' => null]);
+        } else {
+            return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+        }
+
+    }
+
 }
