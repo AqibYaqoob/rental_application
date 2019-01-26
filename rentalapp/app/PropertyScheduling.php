@@ -15,11 +15,11 @@ class PropertyScheduling extends Model implements AuditableContract
 
     public function property_detail()
     {
-        return $this->hasOne(Properties::class, 'property_id', 'id');
+        return $this->hasOne(Properties::class, 'id', 'property_id');
     }
 
     public function applicant()
     {
-        return $this->hasOne(User::class, 'applicant_id', 'id');
+        return $this->hasOne(User::class, 'id', 'applicant_id');
     }
 }

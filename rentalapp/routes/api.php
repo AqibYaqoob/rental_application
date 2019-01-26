@@ -46,7 +46,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('get/properties/all', 'PropertyController@get_landloard_properties');
         // 3) Get Specific Property Details
         Route::post('get/specific/property/details', 'PropertyController@get_specific_property');
-
+        // 4)Remove Property Scheduling
+        Route::post('remove/booking/for/showing', 'PropertyController@removePropertyShowing');
     });
     /*=====  End of Owner Manager Api Details  ======*/
 
@@ -65,6 +66,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     =============================================*/
     Route::group(['prefix' => 'applicant'], function () {
         Route::post('add/scheduling/properties', 'PropertyController@addPropertyScheduling');
+        Route::post('get/specific/property/details', 'PropertyController@get_specific_property');
     });
 
     /*=====  End of Applicant Api Details  ======*/

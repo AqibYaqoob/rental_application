@@ -149,7 +149,6 @@ class PropertyController extends Controller
     public function get_specific_property(Request $req)
     {
         $validationArray = [
-            'user_id'  => 'required',
             'property' => 'required',
         ];
         $rules = [
@@ -161,7 +160,7 @@ class PropertyController extends Controller
         if (count($errors) > 0) {
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
-        $record        = Properties::with('properties_utility')->with('properties_files')->where('user_id', $req->user_id)->where('id', $req->property)->first();
+        $record        = Properties::with('properties_utility')->with('properties_files')->where('id', $req->property)->first();
         $recordDetails = null;
         if ($record) {
             $recordDetails = $record->toArray();
@@ -174,19 +173,22 @@ class PropertyController extends Controller
      * Add Scheduling for the Specific Property for Applying booking
      *
      */
-    public function addPropertyScheduling(Request $request)
+    public function addPropertyScheduling(Request $req)
     {
         $validationArray = [
-            'property'      => 'required',
-            'user_id'       => 'required',
-            'scheduling.*.' => 'required|numeric',
+            'property'     => 'required',
+            'user_id'      => 'required',
+            'scheduling'   => 'required',
+            'scheduling.*' => 'required|numeric',
         ];
         $rules = [
             'property.required'     => 241,
             'user_id.required'      => 234,
+            'scheduling.required'   => 299,
             'scheduling.*.required' => 242,
             'scheduling.*.numeric'  => 243,
         ];
+
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
@@ -199,7 +201,7 @@ class PropertyController extends Controller
             $record[$count]['availibility_date_time'] = $value;
             $record[$count]['property_id']            = $req->property;
             $record[$count]['applicant_id']           = $req->user_id;
-            $record[$count]['created_at']             = Date('Y-m-d');
+            $record[$count]['created_at']             = Date('Y253-m-d');
             $record[$count]['updated_at']             = Date('Y-m-d');
             $count++;
         }
@@ -313,16 +315,37 @@ class PropertyController extends Controller
             'scheduling_id' => 'required',
         ];
         $rules = [
-            'property.required'     => 241,
-            'user_id.required'      => 234,
-            'applicant_id.required' => 247,
+            'property.required'      => 241,
+            'user_id.required'       => 234,
+            'scheduling_id.required' => 254,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
+        try {
+            $getUserRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('id', $req->scheduling_id)->first();
+            if ($getUserRecord) {
+                $deleteProperty = PropertyScheduling::where('id', $req->scheduling_id)->delete();
+                $data           = [
+                    'subject'         => 'Booking Cancel',
+                    'heading_details' => 'Booking for Property (' . $getUserRecord->property_detail->description . ')',
+                    'sub_heading'     => '',
+                    'heading'         => 'Sorry for Inconvinience',
+                    'title'           => 'Unfortunately due some reason your booking has been cancel. We will let you know the new timming soon. Thanks',
+                    'content'         => "------------------",
+                    'email'           => $getUserRecord->applicant->email,
+                ];
+                $sendEmail = GeneralFunctions::sendEmail($data);
+                return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
+            } else {
+                return response()->json(['status' => false, 'errorcode' => [249], 'successcode' => [], 'data' => null]);
+            }
 
+        } catch (Exception $e) {
+            return response()->json(['status' => false, 'errorcode' => [253], 'successcode' => [], 'data' => null]);
+        }
     }
 
 }
