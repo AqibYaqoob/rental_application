@@ -45,7 +45,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         // 2) Get Landloard Properties Detail
         Route::post('get/properties/all', 'PropertyController@get_landloard_properties');
         // 3) Get Specific Property Details
-        Route::post('get/specific/property', 'PropertyController@get_specific_property');
+        Route::post('get/specific/property/details', 'PropertyController@get_specific_property');
 
     });
     /*=====  End of Owner Manager Api Details  ======*/

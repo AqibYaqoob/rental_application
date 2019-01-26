@@ -289,7 +289,7 @@ class PropertyController extends Controller
         }
 
         // Show Property Showing in the Whole record with specific timmings
-        $propertyDetail = Property::with('properties_schedulings.applicant' => function ($query) {
+        $propertyDetail = Property::with('properties_schedulings.applicant', function ($query) {
             $query->where('status', 1);
         })->where('id', $req->property)->first();
         if ($propertyDetail) {
