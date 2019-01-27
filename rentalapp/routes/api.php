@@ -62,7 +62,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         // 9) Pending Bookings Details
         Route::post('pending/booking/details', 'PropertyController@pending_booking_details');
         // 10) Confirmed booking Details
-        Route::post('confirmed/booking/details', 'PropertyController@confirmed_booking_details')
+        Route::post('confirmed/booking/details', 'PropertyController@confirmed_booking_details');
     });
     /*=====  End of Owner Manager Api Details  ======*/
 
