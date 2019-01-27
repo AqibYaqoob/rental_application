@@ -9,6 +9,7 @@ use App\PropertyFiles;
 use App\PropertyRelatedQuestions;
 use App\PropertyScheduling;
 use App\PropertyType;
+use App\User;
 use GeneralFunctions;
 use Illuminate\Http\Request;
 use Validator;
@@ -650,17 +651,30 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
         // Get Properties which are already booked
-        $getApplicants = PropertyScheduling::where('property_id', $req->property)->where('status', 1)->get();
+
+        $getApplicants = User::whereHas('property_scheduling', function ($query) {
+            $query->where('status', 1);
+        })->get();
+        // dd($getApplicants->toArray());
+        // $getApplicants = PropertyScheduling::where('property_id', $req->property)->where('status', 1)->get();
         $getApplicants = $getApplicants->toArray();
         $record        = [];
         if (count($getApplicants) > 0) {
             foreach ($getApplicants as $key => $value) {
-                array_push($record, $value['applicant_id']);
+                array_push($record, $value['id']);
             }
             // Show Pending Booking Details which are applied from applicant side
-            $pendingBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->whereNotIn('applicant_id', $record)->get();
+
+            $pendingBookings = User::with('property_scheduling.property_detail')->whereHas('property_scheduling', function ($query) use ($record, $req) {
+                $query->where('property_id', $req->property);
+                $query->whereNotIn('applicant_id', $record);
+            })->get();
+
+            // $pendingBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->whereNotIn('applicant_id', $record)->get();
         } else {
-            $pendingBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->get();
+            $pendingBookings = User::with('property_scheduling.property_detail')->whereHas('property_scheduling.property_detail', function ($query) use ($record, $req) {
+                $query->where('property_id', $req->property);
+            })->get();
         }
         return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $pendingBookings]);
         // PropertyScheduling::where('property_id', $req->property)->get();
@@ -687,7 +701,10 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
         // Get Properties which are already booked
-        $confirmedBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->where('status', 1)->get();
+        $confirmedBookings = User::with('property_scheduling.property_detail')->whereHas('property_scheduling', function ($query) use ($req) {
+            $query->where('property_id', $req->property);
+            $query->where('status', 1);
+        })->get();
         $confirmedBookings = $confirmedBookings->toArray();
         if (count($confirmedBookings) > 0) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $confirmedBookings]);
