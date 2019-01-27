@@ -59,6 +59,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('property/booking/reschedule', 'PropertyController@reScheduleProperty');
         // 8) Show Non Rented Properties for the Land Loard
         Route::post('non/rented/properties', 'PropertyController@show_rented_property_for_owner');
+        // 9) Pending Bookings Details
     });
     /*=====  End of Owner Manager Api Details  ======*/
 

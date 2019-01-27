@@ -45,9 +45,10 @@ class PropertyController extends Controller
             'zipcode.numeric'                     => 229,
             'city.required'                       => 230,
             'main_image.required'                 => 231,
-            'main_image.base64'                   => 232, , 'user_idrequired' => 234,
+            'main_image.base64'                   => 232,
             'property_type.required'              => 258,
             'property_related_questions.required' => 259,
+            'user_id.required'                    => 234,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
@@ -624,6 +625,35 @@ class PropertyController extends Controller
         } else {
             return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
         }
+    }
+
+    /**
+     *
+     * Pending Booking Details for Specific Property
+     *
+     */
+    public function pending_booking_details(Request $req)
+    {
+        $validationArray = [
+            'property' => 'required',
+            'user_id'  => 'required',
+        ];
+        $rules = [
+            'property.required' => 241,
+            'user_id.required'  => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        // Get Properties which are already booked
+        $getApplicants = PropertyScheduling::where('property_id', $req->property)->where('status', 1)->get();
+        if (count($getApplicants->toArray()) > 0) {
+
+        }
+        // Show Pending Booking Details which are applied from applicant side
+        // PropertyScheduling::where('property_id', $req->property)->get();
     }
 
 }
