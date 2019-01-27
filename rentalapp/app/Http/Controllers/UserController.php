@@ -62,12 +62,11 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $rules = [
-            'user_name' => 'required|string|max:255',
+            'user_name' => 'required|string|max:255|unique:users',
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users',
             'password'  => 'required|string|min:6|confirmed',
             'user_type' => 'required',
-            'package'   => 'required',
         ];
 
         $messages = [
@@ -95,9 +94,13 @@ class UserController extends Controller
             'reference_email_address.required' => 256,
             'reference_phone_number.required'  => 257,
             'reference_phone_number.numeric'   => 258,
+            'user_name.unique'                 => 264,
         ];
-
-        // If Contractor getting Register Do following operations
+        // 1) If Landloard is getting register
+        if ($request->input('user_type') == 1) {
+            $rules['package'] = 'required';
+        }
+        // 2) If Contractor getting Register Do following operations
         if ($request->input('user_type') == 3) {
             $rules['phone_number']            = 'required|string';
             $rules['social_security_number']  = 'required|numeric';
@@ -123,11 +126,13 @@ class UserController extends Controller
             'Roles'     => 4,
             'otp_code'  => $otpCode,
         ]);
-        if ($request->input('user_type') == 3) {
-            $contractorDetails = $this->contractorImplementation($request, $user->id);
-        } else {
+        if ($request->input('user_type') == 1) {
             // Save Package Details
             $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
+        }
+
+        if ($request->input('user_type') == 3) {
+            $contractorDetails = $this->contractorImplementation($request, $user->id);
         }
         // Send Email Varification Code.
         $data = [
@@ -377,9 +382,73 @@ class UserController extends Controller
      * Profile Edit
      *
      */
-    public function profileEdit(Request $req)
+    public function profileEdit(Request $request)
     {
+        $rules = [
+            'user_id'   => 'required',
+            'user_name' => 'required|string|max:255|unique:users,user_name,' . $request->user_id,
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|string|email|max:255|unique:users,email,' . $request->user_id,
+        ];
 
+        $messages = [
+            'name.required'                    => 209,
+            'name.string'                      => 210,
+            'name.max'                         => 211,
+            'email.required'                   => 212,
+            'email.unique'                     => 213,
+            'email.email'                      => 214,
+            'email.string'                     => 215,
+            'user_name.required'               => 209,
+            'user_name.string'                 => 210,
+            'user_name.max'                    => 211,
+            'phone_number.required'            => 251,
+            'phone_number.string'              => 252,
+            'social_security_number.required'  => 253,
+            'social_security_number.numeric'   => 254,
+            'skills_set.required'              => 255,
+            'reference_email_address.required' => 256,
+            'reference_phone_number.required'  => 257,
+            'reference_phone_number.numeric'   => 258,
+            'user_name.unique'                 => 264,
+            'user_id.required'                 => 234,
+        ];
+        // 1) If Contractor getting Register Do following operations
+        if ($request->input('user_type') == 3) {
+            $rules['phone_number']            = 'required|string';
+            $rules['social_security_number']  = 'required|numeric';
+            $rules['skills_set']              = 'required';
+            $rules['reference_email_address'] = 'required';
+            $rules['reference_phone_number']  = 'required|numeric';
+        }
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        $errors = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => $errors, 'successcode' => []]);
+        }
+
+        // Update Record
+        $userRecord = User::where('id', $request->user_id)->update([
+            'name'     => $request->get('name'),
+            'email'    => $request->get('email'),
+            'Username' => $request->get('user_name'),
+        ]);
+
+        if ($request->input('user_type') == 3) {
+            $contractorDetails = [
+                'reference_email'        => $request->reference_email_address,
+                'reference_phone_number' => $request->reference_phone_number,
+                'skill_set'              => $request->skills_set,
+                'social_security_number' => $request->social_security_number,
+                'driving_licence'        => $request->driving_licence,
+            ];
+
+            $saveContractorDetailRecord = ContractorDetails::where('user_id', $request->user_id)->update($contractorDetails);
+        }
+
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
     }
 
     /**
@@ -393,4 +462,41 @@ class UserController extends Controller
         dd($userDetail);
     }
 
+    /**
+     *
+     * Change Password
+     *
+     */
+    public function change_password(Request $req)
+    {
+        $rules = [
+            'old_password' => 'required',
+            'password'     => 'required|string|min:6|confirmed',
+            'user_id'      => 'required',
+        ];
+
+        $messages = [
+            'password.required'     => 216,
+            'password.string'       => 217,
+            'password.min'          => 218,
+            'password.confirmed'    => 219,
+            'user_id.required'      => 234,
+            'old_password.required' => 265,
+        ];
+        $validator = Validator::make($req->all(), $rules, $messages);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => $errors, 'successcode' => []]);
+        }
+
+        // Check if the Old Password is right
+        $user = User::find($req->user_id);
+        if (Hash::check($req->old_password, $user->password)) {
+            // Success
+            $savePassword = User::where('id', $req->user_id)->update(['password' => Hash::make($req->get('password'))]);
+            return response()->json(['status' => true, 'data' => null, 'errorcode' => [], 'successcode' => [200]]);
+        } else {
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [266], 'successcode' => []]);
+        }
+    }
 }

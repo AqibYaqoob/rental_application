@@ -35,6 +35,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::get('user', 'UserController@getAuthenticatedUser');
     Route::get('closed', 'DataController@closed');
     Route::get('get/all/non_rented/properties', 'PropertyController@get_all_non_rented_properties');
+    Route::post('update/profile', 'UserController@profileEdit');
+    Route::post('change/password', 'UserController@change_password');
     // Route::get('get/cities/info', 'UserController@getCities');
     /*=================================================
     =            Owner Manager Api Details            =
@@ -77,6 +79,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('get/property/searchings', 'PropertyController@property_searching');
         Route::post('add/property/favourite', 'PropertyController@add_property_to_favourite');
         Route::post('get/property/favourite', 'PropertyController@show_favourite_property');
+        Route::post('remove/property/favourite', 'PropertyController@remove_favourite_property');
     });
 
     /*=====  End of Applicant Api Details  ======*/
