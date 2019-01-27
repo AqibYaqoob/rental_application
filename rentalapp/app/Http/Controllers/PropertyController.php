@@ -145,7 +145,7 @@ class PropertyController extends Controller
         // Get Result Record
         $record = Properties::with('properties_utility')->with('city_detail')->with('property_type')->with('properties_files')->where('user_id', $req->user_id)->get();
         $record = $record->toArray();
-        if (count($record > 0)) {
+        if (count($record) > 0) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
         } else {
             return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
