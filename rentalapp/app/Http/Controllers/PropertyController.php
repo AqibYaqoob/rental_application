@@ -96,7 +96,7 @@ class PropertyController extends Controller
                 $savePropertyImagesRecord[$keyValue] = [
                     'file_name'   => $uploadMainFile['file_name'],
                     'file_path'   => $uploadMainFile['url'],
-                    'property_id' => $saveProperty->id;
+                    'property_id' => $saveProperty->id,
                     'main_img'    => 0,
                     'created_at'  => Date('Y-m-d'),
                     'updated_at'  => Date('Y-m-d'),
@@ -474,5 +474,20 @@ class PropertyController extends Controller
      * Block comment
      *
      */
-    function
+    public function property_searching(Request $req)
+    {
+        $keyword = $req->details;
+        $record  = Properties::with('properties_utility')->with('properties_files')->wherehas('city_detail', function ($query) use ($keyword) {
+            $query->where('name', 'like', '%' . $keyword . '%');
+        })->orWhere(function ($query) use ($keyword) {
+            $query->where('zipcode', 'like', '%' . $keyword . '%');
+        });
+        if ($req->property_type) {
+            $record = $record->where('property_type', $req->property_type)->get();
+        } else {
+            $record = $record->get();
+        }
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+    }
+
 }

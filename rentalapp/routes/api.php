@@ -74,6 +74,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group(['prefix' => 'applicant'], function () {
         Route::post('add/scheduling/properties', 'PropertyController@addPropertyScheduling');
         Route::post('get/specific/property/details', 'PropertyController@get_specific_property');
+        Route::post('get/property/searchings', 'PropertyController@property_searching');
     });
 
     /*=====  End of Applicant Api Details  ======*/
