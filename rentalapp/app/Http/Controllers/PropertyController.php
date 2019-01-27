@@ -45,15 +45,14 @@ class PropertyController extends Controller
             'zipcode.numeric'                     => 229,
             'city.required'                       => 230,
             'main_image.required'                 => 231,
-            'main_image.base64'                   => 232,
-            'main_image.base64image'              => 233,
-            'user_id.required'                    => 234,
+            'main_image.base64'                   => 232, , 'user_idrequired' => 234,
             'property_type.required'              => 258,
             'property_related_questions.required' => 259,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
+
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
         // 1) Add Property Details First
@@ -575,6 +574,56 @@ class PropertyController extends Controller
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
         }
         return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+    }
+
+    /**
+     *
+     * Apply for Property
+     *
+     */
+    public function apply_for_property(Request $req)
+    {
+        $validationArray = [
+            'property'     => 'required',
+            'applicant_id' => 'required',
+        ];
+        $rules = [
+            'property.required'     => 241,
+            'applicant_id.required' => 247,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+
+    }
+
+    /**
+     *
+     * Show Non Rented Property of specific Owners
+     *
+     */
+    public function show_rented_property_for_owner(Request $req)
+    {
+        $validationArray = [
+            'user_id' => 'required',
+        ];
+        $rules = [
+            'user_id.required' => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        $record = Properties::with('properties_utility')->with('properties_files')->with('city_detail')->with('property_type')->where('status', 0)->where('user_id', $req->user_id)->get();
+        $record = $record->toArray();
+        if (count($record) > 0) {
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+        } else {
+            return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+        }
     }
 
 }

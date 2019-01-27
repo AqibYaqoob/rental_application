@@ -389,6 +389,7 @@ class UserController extends Controller
             'user_name' => 'required|string|max:255|unique:users,user_name,' . $request->user_id,
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users,email,' . $request->user_id,
+            'user_type' => 'required',
         ];
 
         $messages = [
@@ -412,6 +413,7 @@ class UserController extends Controller
             'reference_phone_number.numeric'   => 258,
             'user_name.unique'                 => 264,
             'user_id.required'                 => 234,
+            'user_type.required'               => 220,
         ];
         // 1) If Contractor getting Register Do following operations
         if ($request->input('user_type') == 3) {

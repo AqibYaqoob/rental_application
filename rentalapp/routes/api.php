@@ -57,6 +57,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('property/booking/add', 'PropertyController@add_booking_for_specific_property');
         // 7) Add Showing Booking Details
         Route::post('property/booking/reschedule', 'PropertyController@reScheduleProperty');
+        // 8) Show Non Rented Properties for the Land Loard
+        Route::post('non/rented/properties', 'PropertyController@show_rented_property_for_owner');
     });
     /*=====  End of Owner Manager Api Details  ======*/
 
@@ -80,6 +82,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('add/property/favourite', 'PropertyController@add_property_to_favourite');
         Route::post('get/property/favourite', 'PropertyController@show_favourite_property');
         Route::post('remove/property/favourite', 'PropertyController@remove_favourite_property');
+        // 1) Apply for the Property
+        Route::post('apply/for/properties', 'PropertyController@apply_for_property');
     });
 
     /*=====  End of Applicant Api Details  ======*/
