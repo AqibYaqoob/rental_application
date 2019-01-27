@@ -124,7 +124,7 @@ class UserController extends Controller
             'otp_code'  => $otpCode,
         ]);
         if ($request->input('user_type') == 3) {
-            $contractorDetails = $this->contractorImplementation($request, $user);
+            $contractorDetails = $this->contractorImplementation($request, $user->id);
         } else {
             // Save Package Details
             $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
@@ -360,12 +360,12 @@ class UserController extends Controller
     {
         // 1) Add Contractor Remaining Details
         $contractorDetails = [
-            'reference_email'        => $parameters->reference_email,
+            'reference_email'        => $parameters->reference_email_address,
             'reference_phone_number' => $parameters->reference_phone_number,
-            'skill_set'              => $parameters->skill_set,
+            'skill_set'              => $parameters->skills_set,
             'social_security_number' => $parameters->social_security_number,
             'driving_licence'        => $parameters->driving_licence,
-            'user_id'                => $parameters->user_id,
+            'user_id'                => $userRecord,
         ];
 
         $saveContractorDetailRecord = ContractorDetails::create($contractorDetails);
