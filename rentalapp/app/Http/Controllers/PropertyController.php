@@ -68,7 +68,7 @@ class PropertyController extends Controller
             'property_type' => $req->property_type,
         ];
         $saveProperty = Properties::create($propertDetail);
-        dd($saveProperty);
+
         // 2) Properties Utilities
         $propertyUtilities = [
             'property_id' => $saveProperty->id,
