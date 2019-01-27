@@ -68,6 +68,7 @@ class PropertyController extends Controller
             'property_type' => $req->property_type,
         ];
         $saveProperty = Properties::create($propertDetail);
+        dd($saveProperty);
         // 2) Properties Utilities
         $propertyUtilities = [
             'property_id' => $saveProperty->id,
@@ -90,19 +91,20 @@ class PropertyController extends Controller
             'created_at'  => Date('Y-m-d'),
             'updated_at'  => Date('Y-m-d'),
         ];
-
-        if (count($req->input('other_images')) > 0) {
-            foreach ($req->input('other_images') as $key => $value) {
-                $uploadMainFile                      = GeneralFunctions::uploadFileUsingBase64($value);
-                $keyValue                            = $keyValue + 1;
-                $savePropertyImagesRecord[$keyValue] = [
-                    'file_name'   => $uploadMainFile['file_name'],
-                    'file_path'   => $uploadMainFile['url'],
-                    'property_id' => $saveProperty->id,
-                    'main_img'    => 0,
-                    'created_at'  => Date('Y-m-d'),
-                    'updated_at'  => Date('Y-m-d'),
-                ];
+        if (is_array($req->input('other_images'))) {
+            if (count($req->input('other_images')) > 0) {
+                foreach ($req->input('other_images') as $key => $value) {
+                    $uploadMainFile                      = GeneralFunctions::uploadFileUsingBase64($value);
+                    $keyValue                            = $keyValue + 1;
+                    $savePropertyImagesRecord[$keyValue] = [
+                        'file_name'   => $uploadMainFile['file_name'],
+                        'file_path'   => $uploadMainFile['url'],
+                        'property_id' => $saveProperty->id,
+                        'main_img'    => 0,
+                        'created_at'  => Date('Y-m-d'),
+                        'updated_at'  => Date('Y-m-d'),
+                    ];
+                }
             }
         }
         $savePropertyFileRecord = PropertyFiles::insert($savePropertyImagesRecord);
@@ -649,10 +651,18 @@ class PropertyController extends Controller
         }
         // Get Properties which are already booked
         $getApplicants = PropertyScheduling::where('property_id', $req->property)->where('status', 1)->get();
-        if (count($getApplicants->toArray()) > 0) {
-
+        $getApplicants = $getApplicants->toArray();
+        $record        = [];
+        if (count($getApplicants) > 0) {
+            foreach ($getApplicants as $key => $value) {
+                array_push($record, $value['applicant_id']);
+            }
+            // Show Pending Booking Details which are applied from applicant side
+            $pendingBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->whereNotIn('applicant_id', $record)->get();
+        } else {
+            $pendingBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->get();
         }
-        // Show Pending Booking Details which are applied from applicant side
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $pendingBookings]);
         // PropertyScheduling::where('property_id', $req->property)->get();
     }
 
