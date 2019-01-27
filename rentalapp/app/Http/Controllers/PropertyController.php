@@ -666,4 +666,33 @@ class PropertyController extends Controller
         // PropertyScheduling::where('property_id', $req->property)->get();
     }
 
+    /**
+     *
+     * Pending Booking Details for Specific Property
+     *
+     */
+    public function confirmed_booking_details(Request $req)
+    {
+        $validationArray = [
+            'property' => 'required',
+            'user_id'  => 'required',
+        ];
+        $rules = [
+            'property.required' => 241,
+            'user_id.required'  => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        // Get Properties which are already booked
+        $confirmedBookings = PropertyScheduling::with('applicant')->with('property_detail')->where('property_id', $req->property)->where('status', 1)->get();
+        $confirmedBookings = $confirmedBookings->toArray();
+        if (count($confirmedBookings) > 0) {
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $confirmedBookings]);
+        }
+        return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+    }
+
 }
