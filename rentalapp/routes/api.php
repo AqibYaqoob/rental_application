@@ -75,6 +75,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('add/scheduling/properties', 'PropertyController@addPropertyScheduling');
         Route::post('get/specific/property/details', 'PropertyController@get_specific_property');
         Route::post('get/property/searchings', 'PropertyController@property_searching');
+        Route::post('add/property/favourite', 'PropertyController@add_property_to_favourite');
+        Route::post('get/property/favourite', 'PropertyController@show_favourite_property');
     });
 
     /*=====  End of Applicant Api Details  ======*/

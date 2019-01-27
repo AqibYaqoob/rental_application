@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Properties;
 use App\PropertiesUtility;
+use App\PropertyAddFavourite;
 use App\PropertyFiles;
+use App\PropertyRelatedQuestions;
 use App\PropertyScheduling;
 use App\PropertyType;
 use GeneralFunctions;
@@ -488,6 +490,91 @@ class PropertyController extends Controller
             $record = $record->get();
         }
         return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+    }
+
+    /**
+     *
+     * Add Property to Favourites
+     *
+     */
+    public function add_property_to_favourite(Request $req)
+    {
+        $validationArray = [
+            'property'     => 'required',
+            'applicant_id' => 'required',
+        ];
+        $rules = [
+            'property.required'     => 241,
+            'applicant_id.required' => 247,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        // check if Property is already existed in the Favourites
+        $check = PropertyAddFavourite::where('property_id', $req->property)->where('applicant_id', $req->applicant_id)->get()->toArray();
+        if (count($check) > 0) {
+            return response()->json(['status' => false, 'errorcode' => [263], 'successcode' => [], 'data' => null]);
+        }
+        $saveRecord = PropertyAddFavourite::create(['property_id' => $req->property, 'applicant_id' => $req->applicant_id]);
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
+    }
+
+    /**
+     *
+     * Show List of Favourite Properties for specific applicant
+     *
+     */
+    public function show_favourite_property(Request $req)
+    {
+        $validationArray = [
+            'applicant_id' => 'required',
+        ];
+        $rules = [
+            'applicant_id.required' => 247,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        $getAllFavouriteProperties = PropertyAddFavourite::with('properties_detail')->where('applicant_id', $req->applicant_id)->get()->toArray();
+        if (count($getAllFavouriteProperties) > 0) {
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $getAllFavouriteProperties]);
+        } else {
+            return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+        }
+
+    }
+
+    /**
+     *
+     * Remove Favourite Property
+     *
+     */
+    public function remove_favourite_property(Request $req)
+    {
+        $validationArray = [
+            'property'     => 'required',
+            'applicant_id' => 'required',
+        ];
+        $rules = [
+            'property.required'     => 241,
+            'applicant_id.required' => 247,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        // check if Property is already existed in the Favourites
+        $check = PropertyAddFavourite::where('property_id', $req->property)->where('applicant_id', $req->applicant_id)->get()->toArray();
+        if (count($check) > 0) {
+            $delete = PropertyAddFavourite::where('property_id', $req->property)->where('applicant_id', $req->applicant_id)->delete();
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
+        }
+        return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
     }
 
 }
