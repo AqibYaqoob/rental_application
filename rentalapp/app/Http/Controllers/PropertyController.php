@@ -194,8 +194,9 @@ class PropertyController extends Controller
         $recordDetails = null;
         if ($record) {
             $recordDetails = $record->toArray();
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $recordDetails]);
         }
-        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $recordDetails]);
+        return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
     }
 
     /**
