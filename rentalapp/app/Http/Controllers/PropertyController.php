@@ -543,7 +543,7 @@ class PropertyController extends Controller
         if (count($errors) > 0) {
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
-        $getAllFavouriteProperties = PropertyAddFavourite::with('properties_detail')->where('applicant_id', $req->applicant_id)->get()->toArray();
+        $getAllFavouriteProperties = PropertyAddFavourite::with('properties_detail.properties_utility', 'properties_detail.properties_files', 'properties_detail.properties_schedulings', 'properties_detail.property_type', 'properties_detail.city_detail')->where('applicant_id', $req->applicant_id)->get()->toArray();
         if (count($getAllFavouriteProperties) > 0) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $getAllFavouriteProperties]);
         } else {
