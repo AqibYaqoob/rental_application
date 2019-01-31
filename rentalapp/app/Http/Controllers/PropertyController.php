@@ -206,27 +206,30 @@ class PropertyController extends Controller
      */
     public function addPropertyScheduling(Request $req)
     {
-        $validationArray = [
-            'property'     => 'required',
-            'user_id'      => 'required',
-            'scheduling'   => 'required',
-            'scheduling.*' => 'required|numeric',
-        ];
-        $rules = [
-            'property.required'     => 241,
-            'user_id.required'      => 234,
-            'scheduling.required'   => 299,
-            'scheduling.*.required' => 242,
-            'scheduling.*.numeric'  => 243,
-        ];
-
-        $validator = Validator::make($req->all(), $validationArray, $rules);
-        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
-        if (count($errors) > 0) {
-            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
-        }
-
         try {
+            $validationArray = [
+                'property'     => 'required',
+                'user_id'      => 'required',
+                'scheduling'   => 'required',
+                'scheduling.*' => 'required|numeric',
+            ];
+            $rules = [
+                'property.required'    => 241,
+                'user_id.required'     => 234,
+                'scheduling.required'  => 299,
+                'scheduling.required'  => 242,
+                'scheduling.*.numeric' => 243,
+            ];
+
+            $validator = Validator::make($req->all(), $validationArray, $rules);
+            $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+            if (count($errors) > 0) {
+                return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+            }
+            // 1) Create An Array to add bulk Insert Record If Record is Valid
+            if (!is_array($req->scheduling)) {
+                return response()->json(['status' => false, 'errorcode' => [267], 'successcode' => [], 'data' => null]);
+            }
             $count  = 0;
             $record = array();
             foreach ($req->scheduling as $key => $value) {
@@ -242,7 +245,6 @@ class PropertyController extends Controller
         } catch (Exception $e) {
             return response()->json(['status' => false, 'errorcode' => [$e->getMessage()], 'successcode' => [], 'data' => null]);
         }
-        // 1) Create An Array to add bulk Insert Record If Record is Valid
     }
 
     /**
