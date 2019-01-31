@@ -225,19 +225,24 @@ class PropertyController extends Controller
         if (count($errors) > 0) {
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
-        // 1) Create An Array to add bulk Insert Record If Record is Valid
-        $count  = 0;
-        $record = array();
-        foreach ($req->scheduling as $key => $value) {
-            $record[$count]['availibility_date_time'] = $value;
-            $record[$count]['property_id']            = $req->property;
-            $record[$count]['applicant_id']           = $req->user_id;
-            $record[$count]['created_at']             = Date('Y-m-d');
-            $record[$count]['updated_at']             = Date('Y-m-d');
-            $count++;
+
+        try {
+            $count  = 0;
+            $record = array();
+            foreach ($req->scheduling as $key => $value) {
+                $record[$count]['availibility_date_time'] = $value;
+                $record[$count]['property_id']            = $req->property;
+                $record[$count]['applicant_id']           = $req->user_id;
+                $record[$count]['created_at']             = Date('Y-m-d');
+                $record[$count]['updated_at']             = Date('Y-m-d');
+                $count++;
+            }
+            PropertyScheduling::insert($record);
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+        } catch (Exception $e) {
+            return response()->json(['status' => false, 'errorcode' => [$e->getMessage()], 'successcode' => [], 'data' => null]);
         }
-        PropertyScheduling::insert($record);
-        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+        // 1) Create An Array to add bulk Insert Record If Record is Valid
     }
 
     /**
