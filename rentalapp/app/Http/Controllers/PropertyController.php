@@ -232,7 +232,7 @@ class PropertyController extends Controller
             $record[$count]['availibility_date_time'] = $value;
             $record[$count]['property_id']            = $req->property;
             $record[$count]['applicant_id']           = $req->user_id;
-            $record[$count]['created_at']             = Date('Y253-m-d');
+            $record[$count]['created_at']             = Date('Y-m-d');
             $record[$count]['updated_at']             = Date('Y-m-d');
             $count++;
         }
