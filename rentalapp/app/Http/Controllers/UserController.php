@@ -19,13 +19,15 @@ class UserController extends Controller
     public function authenticate(Request $request)
     {
         $rules = [
-            'email'    => 'required',
-            'password' => 'required',
+            'email'     => 'required',
+            'password'  => 'required',
+            'device_id' => 'required',
         ];
 
         $messages = [
-            'email.required'    => 212,
-            'password.required' => 216,
+            'email.required'     => 212,
+            'password.required'  => 216,
+            'device_id.required' => 268,
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -56,6 +58,8 @@ class UserController extends Controller
         $status      = true;
         $errorcode   = [];
         $successcode = [200];
+        // Add Device Id into User Table and Update Device Id with the user details
+        $updateUserRecord = User::where('id', $record->id)->update(['device_id' => $request->device_id]);
         return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
     }
 
@@ -500,5 +504,15 @@ class UserController extends Controller
         } else {
             return response()->json(['status' => false, 'data' => null, 'errorcode' => [266], 'successcode' => []]);
         }
+    }
+
+    public function test_screen(Request $req)
+    {
+        return view('super_admin_portal.layouts.test_folder.test');
+    }
+
+    public function payment_process(Request $req)
+    {
+        dd($req->all());
     }
 }

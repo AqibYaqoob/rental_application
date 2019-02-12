@@ -18,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $table    = 'users';
     protected $fillable = [
-        'TenantId', 'Username', 'password', 'LastPasswordUpdate', 'IsAdmin', 'LastUpdateBy', 'LastUpdateIPAddress', 'CreatedBy', 'CreatedIPAddress', 'LastLogin', 'LastLoginIPAddress', 'email', 'Roles', 'AccountStatus', 'account_type', 'interest_rate', 'name', 'otp_code', 'otp_check', 'user_type',
+        'TenantId', 'Username', 'password', 'LastPasswordUpdate', 'IsAdmin', 'LastUpdateBy', 'LastUpdateIPAddress', 'CreatedBy', 'CreatedIPAddress', 'LastLogin', 'LastLoginIPAddress', 'email', 'Roles', 'AccountStatus', 'account_type', 'interest_rate', 'name', 'otp_code', 'otp_check', 'user_type', 'device_id',
     ];
 
     // Rest omitted for brevity

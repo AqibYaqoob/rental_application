@@ -9,7 +9,11 @@ use Auth;
 use Carbon\Carbon;
 use DateTime;
 use DB;
+use FCM;
 use Illuminate\Support\Facades\Crypt;
+use LaravelFCM\Message\OptionsBuilder;
+use LaravelFCM\Message\PayloadDataBuilder;
+use LaravelFCM\Message\PayloadNotificationBuilder;
 use Mail;
 
 class GeneralFunctions
@@ -347,5 +351,32 @@ class GeneralFunctions
 // Formatted output
         return $date->format('D, d M Y H:i:s');
     }
+    /**
+     *
+     * Block for Push Notification
+     *
+     */
+    public static function pushNotification($deviceId, $title, $data, $bodyHead)
+    {
+        $optionBuilder = new OptionsBuilder();
+        $optionBuilder->setTimeToLive(60 * 20);
 
+        $notificationBuilder = new PayloadNotificationBuilder($title);
+        $notificationBuilder->setBody($bodyHead)
+            ->setSound('default');
+
+        $dataBuilder = new PayloadDataBuilder();
+        $dataBuilder->addData(['a_data' => $data]);
+
+        $option       = $optionBuilder->build();
+        $notification = $notificationBuilder->build();
+        $data         = $dataBuilder->build();
+
+        // You must change it to get your tokens
+        $tokens = $deviceId;
+
+        $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
+
+        return $downstreamResponse->numberSuccess();
+    }
 }

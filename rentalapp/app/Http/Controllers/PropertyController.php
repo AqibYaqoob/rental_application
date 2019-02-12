@@ -240,8 +240,15 @@ class PropertyController extends Controller
                 $record[$count]['updated_at']             = Date('Y-m-d');
                 $count++;
             }
-            PropertyScheduling::insert($record);
-            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+            $record = PropertyScheduling::insert($record);
+            /*============================================================
+            =            Push Notification to specific Device            =
+            ============================================================*/
+            $sendPushNotification = GeneralFunctions::pushNotification($deviceId, 'New Booking timming for the property', $record, 'Property Booking');
+            if ($sendPushNotification) {
+                return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+            }
+            /*=====  End of Push Notification to specific Device  ======*/
         } catch (Exception $e) {
             return response()->json(['status' => false, 'errorcode' => [$e->getMessage()], 'successcode' => [], 'data' => null]);
         }

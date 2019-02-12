@@ -89,7 +89,19 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         // 1) Apply for the Property
         Route::post('apply/for/properties', 'PropertyController@apply_for_property');
     });
-
     /*=====  End of Applicant Api Details  ======*/
 
+    /*=====================================================================
+    =            Transaction of the Brain Tree Payment Gateway            =
+    =====================================================================*/
+    Route::group(['prefix' => 'transaction'], function () {
+        Route::get('client/generate/token', 'TransactionController@generate_client_token');
+        Route::post('payment/process', 'TransactionController@payment_process');
+    });
+
+    /*=====  End of Transaction of the Brain Tree Payment Gateway  ======*/
+
 });
+
+// Testing Routes
+Route::get('get/test/push/notification', 'GeneralController@push_notification_test');

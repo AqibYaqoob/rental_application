@@ -114,7 +114,6 @@ Route::group(['middleware' => ['localization']], function () {
                 Route::post('/skills/delete', 'SuperAdminControllers\SkillController@delete');
                 /*----------  User Details  ----------*/
                 Route::get('user_details', 'UserController@user_detail_screen');
-
             });
         });
     });
@@ -129,3 +128,5 @@ Auth::routes();
 Route::get('/password/change', 'UserController@showForgetPasswordPage');
 // Password Save Record
 Route::post('new/password/save/record', 'UserController@savePassword');
+Route::get('test', 'UserController@test_screen');
+Route::get('payment/process', 'UserController@payment_process')->name('payment.process');

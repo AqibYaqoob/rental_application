@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        LaravelFCM\FCMServiceProvider::class,
     ],
 
     /*
@@ -229,7 +230,8 @@ return [
         'JWTAuth'          => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory'       => Tymon\JWTAuth\Facades\JWTFactory::class,
         'GeneralFunctions' => App\Helpers\GeneralFunctions::class,
-
+        'FCM'              => LaravelFCM\Facades\FCM::class,
+        'FCMGroup'         => LaravelFCM\Facades\FCMGroup::class, // Optional
     ],
 
 ];

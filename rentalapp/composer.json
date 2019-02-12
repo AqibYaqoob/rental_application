@@ -6,10 +6,12 @@
     "type": "project",
     "require": {
         "php": ">=5.6.4",
+        "braintree/braintree_php": "^3.39",
+        "brozot/laravel-fcm": "^1.2",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
-        "tymon/jwt-auth": "dev-develop",
-        "owen-it/laravel-auditing": "^7.0"
+        "owen-it/laravel-auditing": "^7.0",
+        "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
