@@ -377,6 +377,6 @@ class GeneralFunctions
 
         $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
 
-        return $downstreamResponse->numberFailure();
+        return $downstreamResponse->numberSuccess();
     }
 }
