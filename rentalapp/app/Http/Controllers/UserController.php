@@ -19,22 +19,22 @@ class UserController extends Controller
     public function authenticate(Request $request)
     {
         $rules = [
-            'email'    => 'required',
-            'password' => 'required',
-            // 'device_id' => 'required',
+            'email'     => 'required',
+            'password'  => 'required',
+            'device_id' => 'required',
         ];
 
         $messages = [
-            'email.required'    => 212,
-            'password.required' => 216,
-            // 'device_id.required' => 268,
+            'email.required'     => 212,
+            'password.required'  => 216,
+            'device_id.required' => 299,
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
 
         $errors = GeneralFunctions::error_msg_serialize($validator->errors());
         if (count($errors) > 0) {
-            return response()->json(['status' => false, 'data' => null, 'errorcode' => [400], 'successcode' => []]);
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [$errors], 'successcode' => []]);
         }
 
         $credentials = [
