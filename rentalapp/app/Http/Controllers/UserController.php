@@ -19,15 +19,15 @@ class UserController extends Controller
     public function authenticate(Request $request)
     {
         $rules = [
-            'email'     => 'required',
-            'password'  => 'required',
-            'device_id' => 'required',
+            'email'    => 'required',
+            'password' => 'required',
+            // 'device_id' => 'required',
         ];
 
         $messages = [
-            'email.required'     => 212,
-            'password.required'  => 216,
-            'device_id.required' => 268,
+            'email.required'    => 212,
+            'password.required' => 216,
+            // 'device_id.required' => 268,
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
