@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Braintree_ClientToken;
+use Braintree_Transaction;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
