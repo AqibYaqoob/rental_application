@@ -379,4 +379,18 @@ class GeneralFunctions
 
         return $downstreamResponse->numberSuccess();
     }
+
+    /**
+     *
+     * Check if Properties are not more than the given Package
+     *
+     */
+    public static function checkPackagePropertyRange($user_id)
+    {
+        // 1) Check the count of Total Properties that are added.
+        $totalPropertiesAdded = Properties::where('user_id', $user_id)->get()->toArray();
+        $totalPropertiesAdded = count($totalPropertiesAdded);
+        return $totalPropertiesAdded;
+    }
+
 }

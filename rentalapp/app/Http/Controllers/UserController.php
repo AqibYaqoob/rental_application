@@ -62,7 +62,7 @@ class UserController extends Controller
         $errorcode   = [];
         $successcode = [200];
         // Add Device Id into User Table and Update Device Id with the user details
-        $updateUserRecord = User::where('id', $record->id)->update(['device_id' => $request->device_token]);
+        $updateUserRecord = User::where('id', $record->id)->update(['device_token' => $request->device_token]);
         return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
     }
 
