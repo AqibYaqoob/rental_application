@@ -57,6 +57,12 @@ class PropertyController extends Controller
 
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
+
+        // Check Package Range for Adding the Properties First. If it exceeds than notify user that He/she exceed the limit to add property.
+        $getPermissionForAddingNewProperty = GeneralFunctions::checkPackagePropertyRange($req->user_id);
+        if (!$getPermissionForAddingNewProperty) {
+            return response()->json(['status' => false, 'errorcode' => [300], 'successcode' => [], 'data' => null]);
+        }
         // 1) Add Property Details First
         $propertDetail = [
             'description'   => $req->description,

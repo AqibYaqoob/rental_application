@@ -3,8 +3,10 @@ namespace App\Helpers;
 
 use App\Currency;
 use App\PartnerSetting;
+use App\Properties;
 use App\TenantSettings;
 use App\User;
+use App\UserPackages;
 use Auth;
 use Carbon\Carbon;
 use DateTime;
@@ -388,9 +390,19 @@ class GeneralFunctions
     public static function checkPackagePropertyRange($user_id)
     {
         // 1) Check the count of Total Properties that are added.
-        $totalPropertiesAdded = Properties::where('user_id', $user_id)->get()->toArray();
+        $totalPropertiesAdded = Properties::select('id')->where('user_id', $user_id)->get()->toArray();
         $totalPropertiesAdded = count($totalPropertiesAdded);
-        return $totalPropertiesAdded;
+        // 2) Get Package Details
+        $packageDetails = UserPackages::where('user_id', $user_id)->with('package_detail')->first();
+        if ($packageDetails) {
+            $packageDetails = $packageDetails->toArray();
+        }
+        $packagePropertyRange = $packageDetails['package_detail']['properties_range'];
+        if ($totalPropertiesAdded >= $packagePropertyRange) {
+            return false;
+        }
+
+        return true;
     }
 
 }
