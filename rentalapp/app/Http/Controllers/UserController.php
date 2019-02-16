@@ -19,15 +19,17 @@ class UserController extends Controller
     public function authenticate(Request $request)
     {
         $rules = [
-            'email'     => 'required',
-            'password'  => 'required',
-            'device_id' => 'required',
+            'email'        => 'required',
+            'password'     => 'required',
+            'device_token' => 'required',
+            'user_type'    => 'required',
         ];
 
         $messages = [
-            'email.required'     => 212,
-            'password.required'  => 216,
-            'device_id.required' => 299,
+            'email.required'        => 212,
+            'password.required'     => 216,
+            'device_token.required' => 299,
+            'user_type.required'    => 220,
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -38,8 +40,9 @@ class UserController extends Controller
         }
 
         $credentials = [
-            'email'    => $request->email,
-            'password' => $request->password,
+            'email'     => $request->email,
+            'password'  => $request->password,
+            'user_type' => $request->user_type,
         ];
         $record = User::where('email', $request->email)->first();
         try {
@@ -59,7 +62,7 @@ class UserController extends Controller
         $errorcode   = [];
         $successcode = [200];
         // Add Device Id into User Table and Update Device Id with the user details
-        $updateUserRecord = User::where('id', $record->id)->update(['device_id' => $request->device_id]);
+        $updateUserRecord = User::where('id', $record->id)->update(['device_id' => $request->device_token]);
         return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
     }
 
