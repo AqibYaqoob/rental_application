@@ -26,8 +26,8 @@ class TransactionController extends Controller
     public function payment_process(Request $req)
     {
         try {
-            $payload = $request->input('payload', false);
-            $nonce   = $payload['nonce'];
+            // $payload = $request->input('payload', false);
+            $nonce = $req->nonce;
 
             $status = Braintree_Transaction::sale([
                 'amount'             => '10.00',
