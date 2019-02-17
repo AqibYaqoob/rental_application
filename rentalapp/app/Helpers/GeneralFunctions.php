@@ -362,21 +362,21 @@ class GeneralFunctions
         $optionBuilder = new OptionsBuilder();
         $optionBuilder->setTimeToLive(60 * 20);
 
-        // $notificationBuilder = new PayloadNotificationBuilder($title);
-        // $notificationBuilder->setBody($bodyHead)
-        //     ->setSound('default');
+        $notificationBuilder = new PayloadNotificationBuilder($title);
+        $notificationBuilder->setBody($bodyHead)
+            ->setSound('default');
 
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData(['data' => ['text' => $bodyHead, 'title' => $title, 'line1' => 'Testing', 'line2' => 'Testing']]);
 
-        $option = $optionBuilder->build();
-        // $notification = $notificationBuilder->build();
-        $data = $dataBuilder->build();
+        $option       = $optionBuilder->build();
+        $notification = $notificationBuilder->build();
+        $data         = $dataBuilder->build();
 
         // You must change it to get your tokens
         $tokens = $deviceId;
 
-        $downstreamResponse = FCM::sendTo($tokens, $option, null, $data);
+        $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
 
         return $downstreamResponse->numberSuccess();
     }
