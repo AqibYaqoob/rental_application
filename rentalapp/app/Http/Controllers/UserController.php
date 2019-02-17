@@ -146,7 +146,7 @@ class UserController extends Controller
             =================================================*/
             $transactionRecord = Braintree_Transaction::sale([
                 'amount'             => '10.00',
-                'paymentMethodNonce' => $nonce,
+                'paymentMethodNonce' => $request->nonce,
                 'options'            => [
                     'submitForSettlement' => true,
                 ],
