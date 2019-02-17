@@ -77,6 +77,7 @@ class UserController extends Controller
             'password'       => 'required|string|min:6|confirmed',
             'user_type'      => 'required',
             'payment_option' => 'required',
+            'device_token'   => 'required',
         ];
 
         $messages = [
@@ -107,6 +108,7 @@ class UserController extends Controller
             'user_name.unique'                 => 264,
             'nonce.required'                   => 302,
             'payment_option.required'          => 303,
+            'device_token.required'            => 299,
         ];
         // 1) If Landloard is getting register
         if ($request->input('user_type') == 1) {
@@ -164,6 +166,10 @@ class UserController extends Controller
         if ($request->input('user_type') == 3) {
             $contractorDetails = $this->contractorImplementation($request, $user->id);
         }
+
+        // Update Device Token to given User
+        // Add Device Id into User Table and Update Device Id with the user details
+        $updateUserRecord = User::where('id', $user->id)->update(['device_token' => $request->device_token]);
         // Send Email Varification Code.
         $data = [
             'subject'         => 'Verification',
