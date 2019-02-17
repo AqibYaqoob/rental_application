@@ -415,7 +415,7 @@ class UserController extends Controller
     {
         $rules = [
             'user_id'   => 'required',
-            'user_name' => 'required|string|max:255|unique:users,user_name,' . $request->user_id,
+            'user_name' => 'required|string|max:255|unique:users,Username,' . $request->user_id,
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users,email,' . $request->user_id,
             'user_type' => 'required',
