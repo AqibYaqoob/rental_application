@@ -40,7 +40,7 @@ class TransactionController extends Controller
 
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $status]);
         } catch (Exception $e) {
-            return response()->json(['status' => true, 'errorcode' => [$e->getMessage()], 'successcode' => [], 'data' => null]);
+            return response()->json(['status' => false, 'errorcode' => [$e->getMessage()], 'successcode' => [], 'data' => null]);
         }
     }
 }

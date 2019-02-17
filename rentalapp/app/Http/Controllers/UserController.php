@@ -102,10 +102,13 @@ class UserController extends Controller
             'reference_phone_number.required'  => 257,
             'reference_phone_number.numeric'   => 258,
             'user_name.unique'                 => 264,
+            'nonce.required'                   => 302,
+            'payment_option.required'          => 303,
         ];
         // 1) If Landloard is getting register
         if ($request->input('user_type') == 1) {
             $rules['package'] = 'required';
+            $rules['nonce']   = 'required';
         }
         // 2) If Contractor getting Register Do following operations
         if ($request->input('user_type') == 3) {
@@ -136,6 +139,23 @@ class UserController extends Controller
         if ($request->input('user_type') == 1) {
             // Save Package Details
             $addPackageDetails = UserPackages::create(['user_id' => $user->id, 'package_id' => $request->package]);
+            /*=================================================
+            =            Transaction Update Record            =
+            =================================================*/
+            $transactionRecord = Braintree_Transaction::sale([
+                'amount'             => '10.00',
+                'paymentMethodNonce' => $nonce,
+                'options'            => [
+                    'submitForSettlement' => true,
+                ],
+            ]);
+            $insertTransaction = TransactionDetail::create([
+                'transaction_type' => 1,
+                'amount'           => 10.00,
+                'payment_option'   => $req->payment_option,
+                'user_id'          => $user->id,
+            ]);
+            /*=====  End of Transaction Update Record  ======*/
         }
 
         if ($request->input('user_type') == 3) {
