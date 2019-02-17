@@ -15,6 +15,7 @@ use FCM;
 use Illuminate\Support\Facades\Crypt;
 use LaravelFCM\Message\OptionsBuilder;
 use LaravelFCM\Message\PayloadDataBuilder;
+use LaravelFCM\Message\PayloadNotificationBuilder;
 use Mail;
 
 class GeneralFunctions
