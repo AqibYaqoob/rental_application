@@ -71,11 +71,12 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $rules = [
-            'user_name' => 'required|string|max:255|unique:users,Username',
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|string|email|max:255|unique:users',
-            'password'  => 'required|string|min:6|confirmed',
-            'user_type' => 'required',
+            'user_name'      => 'required|string|max:255|unique:users,Username',
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|string|email|max:255|unique:users',
+            'password'       => 'required|string|min:6|confirmed',
+            'user_type'      => 'required',
+            'payment_option' => 'required',
         ];
 
         $messages = [
@@ -154,7 +155,7 @@ class UserController extends Controller
             $insertTransaction = TransactionDetail::create([
                 'transaction_type' => 1,
                 'amount'           => 10.00,
-                'payment_option'   => $req->payment_option,
+                'payment_option'   => $request->payment_option,
                 'user_id'          => $user->id,
             ]);
             /*=====  End of Transaction Update Record  ======*/
