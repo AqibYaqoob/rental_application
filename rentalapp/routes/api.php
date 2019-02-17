@@ -29,6 +29,7 @@ Route::get('get/skill/set/detail', 'SkillSetController@list');
 Route::get('get/property/type/details', 'PropertyController@get_property_type_list');
 // General Routes
 Route::get('get/payment/options', 'GeneralController@payment_list');
+Route::post('update/device/token', 'GeneralController@update_device_token');
 // End of General Routes
 Route::group(['middleware' => ['jwt.verify']], function () {
     // Authenticate User

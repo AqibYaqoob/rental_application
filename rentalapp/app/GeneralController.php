@@ -44,4 +44,30 @@ class GeneralController extends Controller
         return response()->json(['status' => true, 'data' => $pushNotification]);
     }
 
+    /**
+     *
+     * Update Device Token on Refresh of the Device Token
+     *
+     */
+    public function update_device_token(Request $req)
+    {
+        $validationArray = [
+            'device_token' => 'required',
+            'user_id'      => 'required',
+        ];
+        $rules = [
+            'device_token.required' => 299,
+            'user_id.required'      => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+
+        // Update Device Token for Given User Details
+        $updateUserRecord = User::where('id', $req->user_id)->update(['device_token' => $req->device_token]);
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
+    }
+
 }
