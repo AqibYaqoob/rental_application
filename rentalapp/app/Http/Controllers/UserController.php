@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Cities;
 use App\ContractorDetails;
+use App\TransactionDetail;
 use App\User;
 use App\UserPackages;
+use Braintree_Transaction;
 use GeneralFunctions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
