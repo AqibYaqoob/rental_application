@@ -367,7 +367,7 @@ class GeneralFunctions
         //     ->setSound('default');
 
         $dataBuilder = new PayloadDataBuilder();
-        $dataBuilder->addData(['text' => $bodyHead, 'title' => $title, 'line1' => 'Testing', 'line2' => 'Testing']);
+        $dataBuilder->addData(['data' => ['text' => $bodyHead, 'title' => $title, 'line1' => 'Testing', 'line2' => 'Testing']]);
 
         $option = $optionBuilder->build();
         // $notification = $notificationBuilder->build();
