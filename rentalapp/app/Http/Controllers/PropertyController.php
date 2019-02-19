@@ -10,6 +10,7 @@ use App\PropertyRelatedQuestions;
 use App\PropertyScheduling;
 use App\PropertyType;
 use App\User;
+use DB;
 use GeneralFunctions;
 use Illuminate\Http\Request;
 use Validator;
@@ -251,6 +252,7 @@ class PropertyController extends Controller
             =            Push Notification to specific Device            =
             ============================================================*/
             // Get Device Token of target User Device (Owner of Property)
+
             $deviceToken          = User::select('device_token')->where('id', $req->user_id)->first();
             $sendPushNotification = GeneralFunctions::pushNotification($deviceToken->device_token, 'New Booking timming for the property', ['activity_code' => 10001], 'Property Booking');
             if ($sendPushNotification) {
@@ -724,12 +726,19 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
         // Get Properties which are already booked
-        $confirmedBookings = User::with('property_scheduling.property_detail')->whereHas('property_scheduling', function ($query) use ($req) {
-            $query->where('property_id', $req->property);
-            $query->where('status', 1);
-        })->get();
-        $confirmedBookings = $confirmedBookings->toArray();
-        if (count($confirmedBookings) > 0) {
+        // $confirmedBookings = User::whereHas('property_scheduling', function ($query) use ($req) {
+        //     $query->where('property_id', $req->property);
+        //     $query->where('status', 1);
+        // })->get();
+
+        // Query Builder
+        $confirmedBookings = DB::table('users')
+            ->select('users.id as applicant_id', 'users.Username as username', 'users.email', 'users.name', 'users.user_type', 'property_scheduling.availibility_date_time', 'property_scheduling.property_id')
+            ->join('property_scheduling', 'users.id', '=', 'property_scheduling.applicant_id')
+            ->where('property_scheduling.property_id', $req->property)
+            ->where('property_scheduling.status', 1)
+            ->first();
+        if ($confirmedBookings) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $confirmedBookings]);
         }
         return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
