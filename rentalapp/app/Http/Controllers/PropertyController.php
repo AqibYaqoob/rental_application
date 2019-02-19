@@ -247,13 +247,13 @@ class PropertyController extends Controller
                 $record[$count]['updated_at']             = Date('Y-m-d');
                 $count++;
             }
-            $record = PropertyScheduling::insert($record);
+            // $record = PropertyScheduling::insert($record);
             /*============================================================
             =            Push Notification to specific Device            =
             ============================================================*/
             // Get Device Token of target User Device (Owner of Property)
             $getOwnerUserId       = Properties::select('user_id')->where('id', $req->property)->first();
-            $deviceToken          = User::select('device_token')->where('id', $getOwnerUserId)->first();
+            $deviceToken          = User::select('device_token')->where('id', $getOwnerUserId->user_id)->first();
             $sendPushNotification = GeneralFunctions::pushNotification($deviceToken->device_token, 'New Booking timming for the property', ['activity_code' => 10001], 'Property Booking');
             if ($sendPushNotification) {
                 return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
@@ -385,7 +385,17 @@ class PropertyController extends Controller
             $getUserRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('id', $req->scheduling_id)->first();
             if ($getUserRecord) {
                 $deleteProperty = PropertyScheduling::where('property_id', $req->property)->where('applicant_id', $req->applicant_id)->delete();
-                $data           = [
+                /*============================================================
+                =            Push Notification to specific Device            =
+                ============================================================*/
+                // Get Device Token of target User Device (Applicant of Property booked)
+                $deviceToken          = User::select('device_token')->where('id', $req->applicant_id)->first();
+                $sendPushNotification = GeneralFunctions::pushNotification($deviceToken->device_token, 'Cancel Confirmation for visiting property', ['activity_code' => 10003], 'Cancel Confirmation');
+                if ($sendPushNotification) {
+                    return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+                }
+                /*=====  End of Push Notification to specific Device  ======*/
+                $data = [
                     'subject'         => 'Booking Cancel',
                     'heading_details' => 'Booking for Property (' . $getUserRecord->property_detail->description . ')',
                     'sub_heading'     => '',
