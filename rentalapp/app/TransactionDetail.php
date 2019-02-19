@@ -19,4 +19,9 @@ class TransactionDetail extends Model implements AuditableContract
     protected $fillable = [
         'transaction_type', 'amount', 'payment_option', 'user_id',
     ];
+
+    public function payment_option()
+    {
+        return $this->hasOne(PaymentOptions::class, 'id', 'payment_option');
+    }
 }

@@ -547,4 +547,33 @@ class UserController extends Controller
     {
         dd($req->all());
     }
+
+    /**
+     *
+     * Function for the Transaction Details
+     *
+     */
+    public function transaction_details(Request $req)
+    {
+        $rules = [
+            'user_id' => 'required',
+        ];
+
+        $messages = [
+            'user_id.required' => 234,
+        ];
+        $validator = Validator::make($req->all(), $rules, $messages);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => [400], 'successcode' => []]);
+        }
+
+        $getTransactionDetails = TransactionDetail::with('payment_option')->where('user_id', $req->user_id)->get();
+        $getTransactionDetails = $getTransactionDetails->toArray();
+        if (count($getTransactionDetails) > 0) {
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $getTransactionDetails]);
+        }
+        return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+    }
+
 }
