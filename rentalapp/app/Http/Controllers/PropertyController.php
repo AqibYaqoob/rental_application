@@ -368,11 +368,13 @@ class PropertyController extends Controller
             'property'      => 'required',
             'user_id'       => 'required',
             'scheduling_id' => 'required',
+            'applicant_id'  => 'required',
         ];
         $rules = [
             'property.required'      => 241,
             'user_id.required'       => 234,
             'scheduling_id.required' => 254,
+            'applicant_id.required'  => 247,
         ];
         $validator = Validator::make($req->all(), $validationArray, $rules);
         $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
@@ -382,7 +384,7 @@ class PropertyController extends Controller
         try {
             $getUserRecord = PropertyScheduling::with('applicant')->with('property_detail')->where('id', $req->scheduling_id)->first();
             if ($getUserRecord) {
-                $deleteProperty = PropertyScheduling::where('id', $req->scheduling_id)->delete();
+                $deleteProperty = PropertyScheduling::where('property_id', $req->property)->where('applicant_id', $req->applicant_id)->delete();
                 $data           = [
                     'subject'         => 'Booking Cancel',
                     'heading_details' => 'Booking for Property (' . $getUserRecord->property_detail->description . ')',
@@ -465,6 +467,19 @@ class PropertyController extends Controller
         if ($getNewRecord)
         // Get Applicant Email Address
         {
+            // Add Booking for Showing property
+            $updateShowings = PropertyScheduling::where('id', $req->scheduling_id)->update(['status' => 1]);
+            /*============================================================
+            =            Push Notification to specific Device            =
+            ============================================================*/
+            // Get Device Token of target User Device (Owner of Property)
+            $getApplicantId       = PropertyScheduling::select('applicant_id')->where('id', $req->scheduling_id)->first();
+            $deviceToken          = User::select('device_token')->where('id', $getApplicantId->applicant_id)->first();
+            $sendPushNotification = GeneralFunctions::pushNotification($deviceToken->device_token, 'Confirmation for visiting property', ['activity_code' => 10002], 'Confirmed Booking');
+            if ($sendPushNotification) {
+                return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+            }
+            /*=====  End of Push Notification to specific Device  ======*/
             $data = [
                 'subject'         => 'Booking for Showing Property',
                 'heading_details' => 'Showing Property (' . $getNewRecord->property_detail->description . ')',
@@ -475,8 +490,6 @@ class PropertyController extends Controller
                 'email'           => $getNewRecord->applicant->email,
             ];
             $sendEmail = GeneralFunctions::sendEmail($data);
-            // Add Booking for Showing property
-            $updateShowings = PropertyScheduling::where('id', $req->scheduling_id)->update(['status' => 1]);
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [256], 'data' => null]);
         } else {
             return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
