@@ -252,8 +252,8 @@ class PropertyController extends Controller
             =            Push Notification to specific Device            =
             ============================================================*/
             // Get Device Token of target User Device (Owner of Property)
-
-            $deviceToken          = User::select('device_token')->where('id', $req->user_id)->first();
+            $getOwnerUserId       = Properties::select('user_id')->where('id', $req->property)->first();
+            $deviceToken          = User::select('device_token')->where('id', $getOwnerUserId)->first();
             $sendPushNotification = GeneralFunctions::pushNotification($deviceToken->device_token, 'New Booking timming for the property', ['activity_code' => 10001], 'Property Booking');
             if ($sendPushNotification) {
                 return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
