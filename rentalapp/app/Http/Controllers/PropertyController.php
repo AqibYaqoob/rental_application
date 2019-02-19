@@ -737,8 +737,9 @@ class PropertyController extends Controller
             ->join('property_scheduling', 'users.id', '=', 'property_scheduling.applicant_id')
             ->where('property_scheduling.property_id', $req->property)
             ->where('property_scheduling.status', 1)
-            ->first();
-        if ($confirmedBookings) {
+            ->get();
+        $confirmedBookings = $confirmedBookings->toArray();
+        if (count($confirmedBookings) > 0) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $confirmedBookings]);
         }
         return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
