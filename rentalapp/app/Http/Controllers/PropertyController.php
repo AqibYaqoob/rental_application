@@ -733,7 +733,7 @@ class PropertyController extends Controller
 
         // Query Builder
         $confirmedBookings = DB::table('users')
-            ->select('users.id as applicant_id', 'users.Username as username', 'users.email', 'users.name', 'users.user_type', 'property_scheduling.availibility_date_time', 'property_scheduling.property_id')
+            ->select('users.id as applicant_id', 'users.Username as username', 'users.email', 'users.name', 'users.user_type', 'property_scheduling.availibility_date_time', 'property_scheduling.property_id', 'property_scheduling.id as scheduling_id')
             ->join('property_scheduling', 'users.id', '=', 'property_scheduling.applicant_id')
             ->where('property_scheduling.property_id', $req->property)
             ->where('property_scheduling.status', 1)
