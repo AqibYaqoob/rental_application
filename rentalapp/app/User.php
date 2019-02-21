@@ -112,4 +112,8 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(PropertyScheduling::class, 'applicant_id', 'id');
     }
+    public function user_profile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id', 'id');
+    }
 }

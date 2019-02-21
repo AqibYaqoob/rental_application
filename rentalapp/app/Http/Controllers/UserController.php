@@ -7,6 +7,7 @@ use App\ContractorDetails;
 use App\TransactionDetail;
 use App\User;
 use App\UserPackages;
+use App\UserProfile;
 use Braintree_Transaction;
 use GeneralFunctions;
 use Illuminate\Http\Request;
@@ -46,7 +47,7 @@ class UserController extends Controller
             'password'  => $request->password,
             'user_type' => $request->user_type,
         ];
-        $record = User::where('email', $request->email)->first();
+        $record = User::with('user_profile')->where('email', $request->email)->first();
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['status' => false, 'data' => null, 'errorcode' => [207], 'successcode' => []]);
@@ -142,6 +143,14 @@ class UserController extends Controller
             'Username'  => $request->get('user_name'),
             'Roles'     => 4,
             'otp_code'  => $otpCode,
+        ]);
+
+        // Add Profile Image which is optional
+        $uploadProfileImg   = GeneralFunctions::uploadFileUsingBase64($request->profile_image);
+        $saveProfileDetails = UserProfile::create([
+            'file_name' => $uploadProfileImg['file_name'],
+            'file_path' => $uploadProfileImg['url'],
+            'user_id'   => $user->id,
         ]);
         if ($request->input('user_type') == 1) {
             // Save Package Details
