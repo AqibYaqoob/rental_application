@@ -11,5 +11,5 @@ class ChatMessages extends Model implements AuditableContract
     use Auditable;
     protected $primaryKey = 'id';
     protected $table      = 'chat_messages';
-    protected $fillable   = ['identifier', 'message', 'from_user_id'];
+    protected $fillable   = ['identifier', 'message', 'from_user_id', 'attachment'];
 }

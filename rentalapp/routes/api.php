@@ -66,6 +66,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('confirmed/booking/details', 'PropertyController@confirmed_booking_details');
         // 11) Transaction Details for the Account
         Route::post('transaction/details', 'UserController@transaction_details');
+        // 12) To check if no property is added than app should prompt to add Property.
+        Route::post('check/any/property/added', 'PropertyController@check_available_property');
     });
     /*=====  End of Owner Manager Api Details  ======*/
 

@@ -768,4 +768,32 @@ class PropertyController extends Controller
         return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
     }
 
+    /**
+     *
+     * Check Available Properties
+     *
+     */
+    public function check_available_property(Request $req)
+    {
+        $validationArray = [
+            'owner_user_id' => 'required',
+        ];
+        $rules = [
+            'owner_user_id.required' => 234,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+
+        // Check if Any Property is Existed with owner
+        // Get Result Record
+        $record = Properties::select('id')->where('user_id', $req->owner_user_id)->first();
+        if ($record) {
+            return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
+        }
+        return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
+    }
+
 }

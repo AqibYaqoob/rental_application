@@ -78,6 +78,7 @@ class UserController extends Controller
             'user_type'      => 'required',
             'payment_option' => 'required',
             'device_token'   => 'required',
+            'profile_image'  => 'base64',
         ];
 
         $messages = [
@@ -109,6 +110,7 @@ class UserController extends Controller
             'nonce.required'                   => 302,
             'payment_option.required'          => 303,
             'device_token.required'            => 299,
+            'profile_image.base64'             => 232,
         ];
         // 1) If Landloard is getting register
         if ($request->input('user_type') == 1) {
