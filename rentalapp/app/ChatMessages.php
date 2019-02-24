@@ -12,4 +12,14 @@ class ChatMessages extends Model implements AuditableContract
     protected $primaryKey = 'id';
     protected $table      = 'chat_messages';
     protected $fillable   = ['identifier', 'message', 'from_user_id', 'attachment'];
+
+    public function attachment()
+    {
+        return $this->hasOne(ChatMessagesAttachment::class, 'id', 'attachment');
+    }
+
+    public function user_profile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id', 'from_user_id');
+    }
 }

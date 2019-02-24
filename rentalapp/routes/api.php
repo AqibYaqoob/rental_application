@@ -18,6 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('register', 'UserController@register');
+Route::post('register/validation', 'UserController@register_validation');
 Route::post('login', 'UserController@authenticate');
 Route::post('forget/password', 'UserController@forget_password');
 Route::get('open', 'DataController@open');
@@ -96,7 +97,24 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     });
     /*=====  End of Applicant Api Details  ======*/
 
+    /*=====================================================================
+    =            Chat Module for (Owner, Applicant, Contractor)            =
+    ======================================================================*/
+    Route::post('get/applicants/list', 'ChatController@get_applicants_list');
+    Route::post('get/owners/list', 'ChatController@get_owners_list');
+    Route::group(['prefix' => 'chat'], function () {
+        Route::post('message', 'ChatController@chat');
+        Route::post('get/messages', 'ChatController@get_chat_messages');
+
+    });
+    /*=====  End of Chat Module for (Owner, Applicant, Contractor)  ======*/
 });
+
+/*====================================================
+=            Update User (online/offline)            =
+=====================================================*/
+Route::post('update/user/status', 'UserController@update_user_status');
+/*=====  End of Update User (online/offline)  ======*/
 
 /*=====================================================================
 =            Transaction of the Brain Tree Payment Gateway            =
@@ -105,7 +123,6 @@ Route::group(['prefix' => 'transaction'], function () {
     Route::get('client/generate/token', 'TransactionController@generate_client_token');
     Route::post('payment/process', 'TransactionController@payment_process');
 });
-
 /*=====  End of Transaction of the Brain Tree Payment Gateway  ======*/
 
 // Testing Routes

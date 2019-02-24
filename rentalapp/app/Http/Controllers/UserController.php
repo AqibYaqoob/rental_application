@@ -69,17 +69,21 @@ class UserController extends Controller
         return response()->json(compact('data', 'status', 'errorcode', 'successcode'));
     }
 
-    public function register(Request $request)
+    public function register_validation(Request $request)
     {
         $rules = [
-            'user_name'      => 'required|string|max:255|unique:users,Username',
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|string|email|max:255|unique:users',
-            'password'       => 'required|string|min:6|confirmed',
-            'user_type'      => 'required',
-            'payment_option' => 'required',
-            'device_token'   => 'required',
-            'profile_image'  => 'base64',
+            'user_name'        => 'required|string|max:255|unique:users,Username',
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|string|email|max:255|unique:users',
+            'password'         => 'required|string|min:6|confirmed',
+            'user_type'        => 'required',
+            'payment_option'   => 'required',
+            'device_token'     => 'required',
+            'profile_image'    => 'base64',
+            'zip_code'         => 'required',
+            // 'longitutde'       => 'required',
+            // 'latitude'         => 'required',
+            'personal_address' => 'required',
         ];
 
         $messages = [
@@ -108,15 +112,19 @@ class UserController extends Controller
             'reference_phone_number.required'  => 257,
             'reference_phone_number.numeric'   => 258,
             'user_name.unique'                 => 264,
-            'nonce.required'                   => 302,
+            // 'nonce.required'                   => 302,
             'payment_option.required'          => 303,
             'device_token.required'            => 299,
             'profile_image.base64'             => 232,
+            'zip_code.required'                => 303,
+            // 'longitutde.required'              => 304,
+            // 'latitude.required'                => 305,
+            'personal_address.required'        => 306,
         ];
         // 1) If Landloard is getting register
         if ($request->input('user_type') == 1) {
             $rules['package'] = 'required';
-            $rules['nonce']   = 'required';
+            // $rules['nonce']   = 'required';
         }
         // 2) If Contractor getting Register Do following operations
         if ($request->input('user_type') == 3) {
@@ -127,6 +135,24 @@ class UserController extends Controller
             $rules['reference_phone_number']  = 'required|numeric';
         }
 
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        $errors = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => $errors, 'successcode' => []]);
+        }
+        return response()->json(['status' => true, 'data' => null, 'errorcode' => [], 'successcode' => [200]]);
+    }
+
+    public function register(Request $request)
+    {
+        $rules    = [];
+        $messages = [
+            'nonce.required' => 302,
+        ];
+        if ($request->input('user_type') == 1) {
+            $rules['nonce'] = 'required';
+        }
         $validator = Validator::make($request->all(), $rules, $messages);
 
         $errors = GeneralFunctions::error_msg_serialize($validator->errors());
@@ -148,9 +174,13 @@ class UserController extends Controller
         // Add Profile Image which is optional
         $uploadProfileImg   = GeneralFunctions::uploadFileUsingBase64($request->profile_image);
         $saveProfileDetails = UserProfile::create([
-            'file_name' => $uploadProfileImg['file_name'],
-            'file_path' => $uploadProfileImg['url'],
-            'user_id'   => $user->id,
+            'file_name'        => $uploadProfileImg['file_name'],
+            'file_path'        => $uploadProfileImg['url'],
+            'user_id'          => $user->id,
+            'zip_code'         => $request->zip_code,
+            'longitutde'       => $request->longitutde,
+            'latitude'         => $request->latitude,
+            'personal_address' => $request->personal_address,
         ]);
         if ($request->input('user_type') == 1) {
             // Save Package Details
@@ -347,7 +377,7 @@ class UserController extends Controller
             return response()->json(['status' => false, 'data' => null, 'errorcode' => [400], 'successcode' => []]);
         }
         // Verify User First
-        $getUser = User::where('otp_code', $req->otp_code)->where('id', $req->user_id)->first();
+        $getUser = User::with('user_profile')->where('otp_code', $req->otp_code)->where('id', $req->user_id)->first();
         if ($getUser) {
             // Update OTP Check
             User::where('id', $req->user_id)->update(['otp_check' => 1]);
@@ -587,4 +617,30 @@ class UserController extends Controller
         return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
     }
 
+    /**
+     *
+     * Update User status (online / offline)
+     *
+     */
+    public function update_user_status(Request $req)
+    {
+        $rules = [
+            'status'  => 'required',
+            'user_id' => 'required',
+        ];
+
+        $messages = [
+            'status.required'  => 319,
+            'user_id.required' => 234,
+        ];
+        $validator = Validator::make($req->all(), $rules, $messages);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'data' => null, 'errorcode' => $errors, 'successcode' => []]);
+        }
+
+        // Update User Status
+        $updateStatus = User::where('id', $req->user_id)->update(['is_online', $req->status]);
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
+    }
 }

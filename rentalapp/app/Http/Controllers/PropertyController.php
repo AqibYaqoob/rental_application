@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Properties;
 use App\PropertiesUtility;
 use App\PropertyAddFavourite;
+use App\PropertyApplicants;
 use App\PropertyFiles;
+use App\PropertyRelatedAnswers;
 use App\PropertyRelatedQuestions;
 use App\PropertyScheduling;
 use App\PropertyType;
@@ -35,6 +37,7 @@ class PropertyController extends Controller
             'user_id'                    => 'required',
             'property_type'              => 'required',
             'property_related_questions' => 'required',
+            'rent'                       => 'required',
         ];
         $rules = [
             'description.required'                => 222,
@@ -59,6 +62,20 @@ class PropertyController extends Controller
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
 
+        if ($req->property_related_questions == 1) {
+            if (is_array($req->questions)) {
+                if (count($req->questions) > 0) {
+                    if (count($req->questions) > 4) {
+                        return response()->json(['status' => false, 'errorcode' => [262], 'successcode' => [], 'data' => null]);
+                    }
+                } else {
+                    return response()->json(['status' => false, 'errorcode' => [260], 'successcode' => [], 'data' => null]);
+                }
+            } else {
+                return response()->json(['status' => false, 'errorcode' => [261], 'successcode' => [261], 'data' => null]);
+            }
+        }
+
         // Check Package Range for Adding the Properties First. If it exceeds than notify user that He/she exceed the limit to add property.
         $getPermissionForAddingNewProperty = GeneralFunctions::checkPackagePropertyRange($req->user_id);
         if (!$getPermissionForAddingNewProperty) {
@@ -66,14 +83,16 @@ class PropertyController extends Controller
         }
         // 1) Add Property Details First
         $propertDetail = [
-            'description'   => $req->description,
-            'address'       => $req->address,
-            'latitude'      => $req->latitude,
-            'longitutde'    => $req->longitutde,
-            'zipcode'       => $req->zipcode,
-            'city'          => $req->city,
-            'user_id'       => $req->user_id,
-            'property_type' => $req->property_type,
+            'description'     => $req->description,
+            'address'         => $req->address,
+            'latitude'        => $req->latitude,
+            'longitutde'      => $req->longitutde,
+            'zipcode'         => $req->zipcode,
+            'city'            => $req->city,
+            'user_id'         => $req->user_id,
+            'property_type'   => $req->property_type,
+            'application_fee' => $req->application_fee,
+            'rent'            => $req->rent,
         ];
         $saveProperty = Properties::create($propertDetail);
 
@@ -118,22 +137,12 @@ class PropertyController extends Controller
         $savePropertyFileRecord = PropertyFiles::insert($savePropertyImagesRecord);
         if ($req->property_related_questions == 1) {
             // Added Property Related Questions
-            if (is_array($req->questions)) {
-                if (count($req->questions) > 0) {
-                    if (count($req->questions) > 4) {
-                        return response()->json(['status' => false, 'errorcode' => [262], 'successcode' => [], 'data' => null]);
-                    }
-                    $propertyQuestions['property_id'] = $saveProperty->id;
-                    foreach ($req->questions as $key => $value) {
-                        $propertyQuestions['property_question_' . $key + 1] = $value;
-                    }
-                    PropertyRelatedQuestions::create($propertyQuestions);
-                } else {
-                    return response()->json(['status' => false, 'errorcode' => [260], 'successcode' => [], 'data' => null]);
-                }
-            } else {
-                return response()->json(['status' => false, 'errorcode' => [261], 'successcode' => [261], 'data' => null]);
+            $propertyQuestions['property_id'] = $saveProperty->id;
+            foreach ($req->questions as $key => $value) {
+                $countIndex                                            = (int) $key + 1;
+                $propertyQuestions['property_question_' . $countIndex] = $value;
             }
+            PropertyRelatedQuestions::create($propertyQuestions);
         }
         return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
     }
@@ -226,8 +235,26 @@ class PropertyController extends Controller
                 'scheduling.required'  => 299,
                 'scheduling.required'  => 242,
                 'scheduling.*.numeric' => 243,
+                'answers.required'     => 308,
+                'answers.0.required'   => 309,
+                'answers.1.required'   => 310,
+                'answers.2.required'   => 311,
+                'answers.3.required'   => 312,
             ];
 
+            $checkAnyQuestions = PropertyRelatedQuestions::where('property_id', $req->property)->first();
+            // Check if Any questions are asked for this property
+            $propertyAnswers = [];
+            if ($checkAnyQuestions) {
+                for ($i = 0; $i < 4; $i++) {
+                    $countValue    = $i + 1;
+                    $propertyValue = 'property_question_' . $countValue;
+                    if ($checkAnyQuestions->{$propertyValue} != null) {
+                        $validationArray['answers.' . $i] = 'required';
+                    }
+                }
+                $validationArray['answers'] = 'required';
+            }
             $validator = Validator::make($req->all(), $validationArray, $rules);
             $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
             if (count($errors) > 0) {
@@ -247,7 +274,26 @@ class PropertyController extends Controller
                 $record[$count]['updated_at']             = Date('Y-m-d');
                 $count++;
             }
-            // $record = PropertyScheduling::insert($record);
+
+            /**
+             *
+             * Add Answers
+             *
+             */
+            if ($checkAnyQuestions) {
+                for ($i = 0; $i < 4; $i++) {
+                    $countValue    = $i + 1;
+                    $propertyValue = 'property_question_' . $countValue;
+                    if ($checkAnyQuestions->{$propertyValue} != null) {
+                        $propertyAnswers['answer_' . $countValue] = $req->answers[$i];
+                    }
+                }
+                $propertyAnswers['property_id']  = $req->property;
+                $propertyAnswers['applicant_id'] = $req->user_id;
+            }
+            $saveAnswersRecord = PropertyRelatedAnswers::create($propertyAnswers);
+            $applicantApply    = PropertyApplicants::create(['property_id' => $req->property, 'applicant_id' => $req->user_id]);
+            $record            = PropertyScheduling::insert($record);
             /*============================================================
             =            Push Notification to specific Device            =
             ============================================================*/
