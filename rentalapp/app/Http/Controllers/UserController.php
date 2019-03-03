@@ -148,10 +148,12 @@ class UserController extends Controller
     {
         $rules    = [];
         $messages = [
-            'nonce.required' => 302,
+            'nonce.required'   => 302,
+            'package.required' => 250,
         ];
         if ($request->input('user_type') == 1) {
-            $rules['nonce'] = 'required';
+            $rules['nonce']   = 'required';
+            $rules['package'] = 'required';
         }
         $validator = Validator::make($request->all(), $rules, $messages);
 

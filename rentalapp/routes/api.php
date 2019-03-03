@@ -94,6 +94,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('remove/property/favourite', 'PropertyController@remove_favourite_property');
         // 1) Apply for the Property
         Route::post('apply/for/properties', 'PropertyController@apply_for_property');
+        // 2) Get total Number of Applications for Properties
+        Route::post('total/applied', 'PropertyController@total_applications');
     });
     /*=====  End of Applicant Api Details  ======*/
 

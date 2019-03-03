@@ -842,4 +842,27 @@ class PropertyController extends Controller
         return response()->json(['status' => false, 'errorcode' => [235], 'successcode' => [], 'data' => null]);
     }
 
+    /**
+     *
+     * Total Number of Applied Properties
+     *
+     */
+    public function total_applications(Request $req)
+    {
+        $validationArray = [
+            'applicant_id' => 'required',
+        ];
+        $rules = [
+            'applicant_id.required' => 247,
+        ];
+        $validator = Validator::make($req->all(), $validationArray, $rules);
+        $errors    = GeneralFunctions::error_msg_serialize($validator->errors());
+        if (count($errors) > 0) {
+            return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
+        }
+        // Get Total Applications
+        $totalApplications = PropertyApplicants::where('applicant_id', $req->applicant_id)->count();
+
+        return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $totalApplications]);
+    }
 }
