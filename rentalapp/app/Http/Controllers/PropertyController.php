@@ -290,10 +290,11 @@ class PropertyController extends Controller
                 }
                 $propertyAnswers['property_id']  = $req->property;
                 $propertyAnswers['applicant_id'] = $req->user_id;
+                $saveAnswersRecord               = PropertyRelatedAnswers::create($propertyAnswers);
             }
-            $saveAnswersRecord = PropertyRelatedAnswers::create($propertyAnswers);
-            $applicantApply    = PropertyApplicants::create(['property_id' => $req->property, 'applicant_id' => $req->user_id]);
-            $record            = PropertyScheduling::insert($record);
+
+            $applicantApply = PropertyApplicants::create(['property_id' => $req->property, 'applicant_id' => $req->user_id]);
+            $record         = PropertyScheduling::insert($record);
             /*============================================================
             =            Push Notification to specific Device            =
             ============================================================*/
