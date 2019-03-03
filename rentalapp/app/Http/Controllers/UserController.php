@@ -122,10 +122,10 @@ class UserController extends Controller
             'personal_address.required'        => 306,
         ];
         // 1) If Landloard is getting register
-        if ($request->input('user_type') == 1) {
-            $rules['package'] = 'required';
-            // $rules['nonce']   = 'required';
-        }
+        // if ($request->input('user_type') == 1) {
+        //     $rules['package'] = 'required';
+        //     // $rules['nonce']   = 'required';
+        // }
         // 2) If Contractor getting Register Do following operations
         if ($request->input('user_type') == 3) {
             $rules['phone_number']            = 'required|string';
