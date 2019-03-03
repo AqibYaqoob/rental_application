@@ -77,7 +77,7 @@ class UserController extends Controller
             'email'            => 'required|string|email|max:255|unique:users',
             'password'         => 'required|string|min:6|confirmed',
             'user_type'        => 'required',
-            'payment_option'   => 'required',
+            // 'payment_option'   => 'required',
             'device_token'     => 'required',
             'profile_image'    => 'base64',
             'zip_code'         => 'required',
