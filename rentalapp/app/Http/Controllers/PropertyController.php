@@ -304,6 +304,8 @@ class PropertyController extends Controller
             $sendPushNotification = GeneralFunctions::pushNotification($deviceToken->device_token, 'New Booking timming for the property', ['activity_code' => 10001], 'Property Booking');
             if ($sendPushNotification) {
                 return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
+            } else {
+                return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $record]);
             }
             /*=====  End of Push Notification to specific Device  ======*/
         } catch (Exception $e) {
