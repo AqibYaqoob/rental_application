@@ -167,12 +167,10 @@ class ChatController extends Controller
             return response()->json(['status' => false, 'errorcode' => $errors, 'successcode' => [], 'data' => null]);
         }
         /*----------  Get Applicants List with Status (offline / Online)  ----------*/
-        $ownerDetails = DB::table('property_applicants')
-            ->join('properties', 'properties.id', '=', 'property_applicants.property_id')
-            ->join('users', 'users.id', '=', 'properties.user_id')
+        $ownerDetails = DB::table('users')
             ->join('user_profile', 'user_profile.user_id', '=', 'users.id')
             ->select('users.id as owner_id', 'users.is_online', 'users.name as owner_name', 'users.email', 'users.device_token', 'user_profile.file_path as profile_image_path')
-            ->where('property_applicants.applicant_id', $req->applicant_id)
+            ->where('users.user_type', 1)
             ->get();
         $ownerDetails = $ownerDetails->toArray();
         if (count($ownerDetails) > 0) {
