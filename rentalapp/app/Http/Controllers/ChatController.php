@@ -85,8 +85,8 @@ class ChatController extends Controller
         // 1) sort the ids
         $chatRoom = [$req->user_id, $req->target_user_id];
         sort($chatRoom);
-        $chatRoomObject    = $chatRoom[0] . ':' . $chatRoom[1];
-        $chatTotalMessages = DB::select("INSERT INTO chat_total_message (identifier, total_messages) VALUES ('$chatRoomObject',  1) ON DUPLICATE KEY UPDATE total_messages = total_messages + 1;");
+        $chatRoomObject = $chatRoom[0] . ':' . $chatRoom[1];
+        // $chatTotalMessages = DB::select("INSERT INTO chat_total_message (identifier, total_messages) VALUES ('$chatRoomObject',  1) ON DUPLICATE KEY UPDATE total_messages = total_messages + 1;");
 
         /**
          *
@@ -116,7 +116,7 @@ class ChatController extends Controller
         if ($sendPushNotification) {
             return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => null]);
         } else {
-            return response()->json(['status' => false, 'errorcode' => [], 'successcode' => [318], 'data' => null]);
+            return response()->json(['status' => false, 'errorcode' => [318], 'successcode' => [], 'data' => null]);
         }
     }
 
