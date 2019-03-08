@@ -34,7 +34,7 @@ class ChatController extends Controller
         /*----------  Get Applicants List with Status (offline / Online)  ----------*/
         $applicantDetails = DB::table('users')
             ->join('user_profile', 'user_profile.user_id', '=', 'users.id')
-            ->select('users.id as owner_id', 'users.is_online', 'users.name as owner_name', 'users.email', 'users.device_token', 'user_profile.file_path as profile_image_path')
+            ->select('users.id as applicant_id', 'users.is_online', 'users.name as applicant_name', 'users.email', 'users.device_token', 'user_profile.file_path as profile_image_path')
             ->where('users.user_type', 2)
             ->get();
         $applicantDetails = $applicantDetails->toArray();
