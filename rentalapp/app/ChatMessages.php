@@ -22,4 +22,9 @@ class ChatMessages extends Model implements AuditableContract
     {
         return $this->hasOne(UserProfile::class, 'user_id', 'from_user_id');
     }
+
+    public function user_type()
+    {
+        return $this->hasOne(User::class, 'id', 'from_user_id')->select('id', 'user_type');
+    }
 }

@@ -142,7 +142,7 @@ class ChatController extends Controller
         $chatRoom = [$req->user_id, $req->target_user_id];
         sort($chatRoom);
         $chatRoomObject = $chatRoom[0] . ':' . $chatRoom[1];
-        $messages       = ChatMessages::with('attachment', 'user_profile')->where('identifier', $chatRoomObject)->get()->toArray();
+        $messages       = ChatMessages::with('attachment', 'user_profile', 'user_type')->where('identifier', $chatRoomObject)->get()->toArray();
         return response()->json(['status' => true, 'errorcode' => [], 'successcode' => [200], 'data' => $messages]);
     }
 
